@@ -1,6 +1,8 @@
-package quotation;
+package app;
 
-import internal.ValidationFunctions;
+import lender.Lender;
+import lender.LenderValidator;
+import quote.Quote;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 
-public class LoanQuote {
+public class App {
 
     public static void main(String[] args) throws IOException {
         validateUserInput(args);
@@ -30,8 +32,8 @@ public class LoanQuote {
     }
 
     private static void validateUserInput(String[] args) {
-        ValidationFunctions.validateAmountOfInputParameters(args);
-        ValidationFunctions.validateAmountToBorrowValue(args[1]);
+        UserInputValidator.validateAmountOfInputParameters(args);
+        UserInputValidator.validateAmountToBorrowValue(args[1]);
     }
 
     private static List<Lender> loadLendersData(String arg) throws IOException {
@@ -46,7 +48,7 @@ public class LoanQuote {
             while ((line = reader.readLine()) != null) {
                 String[] lenderData = line.split(",");
 
-                if (ValidationFunctions.isLenderDataValid(lenderData)) {
+                if (LenderValidator.isLenderDataValid(lenderData)) {
                     lenders.add(new Lender(lenderData));
                 }
             }

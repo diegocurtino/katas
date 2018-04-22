@@ -1,4 +1,4 @@
-quotation.Lender,Rate ,Available
+lender.Lender,Rate ,Available
 Bob             ,0;075,640
 Jane            ,0.069,480
 Fred            ,0.071,520

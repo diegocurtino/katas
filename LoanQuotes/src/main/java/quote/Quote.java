@@ -1,4 +1,6 @@
-package quotation;
+package quote;
+
+import lender.Lender;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

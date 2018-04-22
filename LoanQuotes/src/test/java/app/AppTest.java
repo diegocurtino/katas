@@ -1,10 +1,12 @@
-package quotation;
+package app;
 
-import internal.ValidationFunctions;
+import lender.Lender;
+import lender.LenderValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import quote.Quote;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,12 +23,12 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class LoanQuoteTest {
+public class AppTest {
 
     private static Stream<Arguments> invalidInputParametersProvider() {
         return Stream.of(
                 Arguments.of(new String[]{""}, RuntimeException.class, "At least one of the required parameters (lenderInfo and amount to borrow) is missing \n" +
-                        " Please check how you are calling the application, eg: quotation.LoanQuote <lendersFileName.csv> <1000>"),
+                        " Please check how you are calling the application, eg: app.App <lendersFileName.csv> <1000>"),
                 Arguments.of(new String[]{"x.csv", "1,3"}, NumberFormatException.class, "The value specified as amount to borrow (1,3) is not a number. Please check the value."),
                 Arguments.of(new String[]{"x.csv", "99"}, IllegalArgumentException.class, "The amount requested (99) is below the minimum amount this bank loans."),
                 Arguments.of(new String[]{"x.csv", "15001"}, IllegalArgumentException.class, "The amount requested (15001) is above the maximum amount this bank loans."),
@@ -53,7 +55,7 @@ public class LoanQuoteTest {
             reader.readLine(); // Skip the header (going with the assumption that files will contain a header as in the provided example)
             while ((line = reader.readLine()) != null) {
                 String[] lenderData = line.split(",");
-                if (ValidationFunctions.isLenderDataValid(lenderData)) {
+                if (LenderValidator.isLenderDataValid(lenderData)) {
                     lenders.add(new Lender(lenderData));
                 }
             }
@@ -88,7 +90,7 @@ public class LoanQuoteTest {
     @ParameterizedTest
     @MethodSource("invalidInputParametersProvider")
     void validateIncorrectInputParameters(String[] cliParameters, Class expectedExceptionClass, String expectedMessage) {
-        Exception e = (Exception) assertThrows(expectedExceptionClass, () -> LoanQuote.main(cliParameters));
+        Exception e = (Exception) assertThrows(expectedExceptionClass, () -> App.main(cliParameters));
         assertEquals(e.getMessage(), expectedMessage);
     }
 
@@ -113,7 +115,7 @@ public class LoanQuoteTest {
     void testAbilityToSatisfyLoanRequest(String lendersFilename, int amountRequested, boolean expectedResult) throws IOException {
         List<Lender> lenders = loadLendersData(lendersFilename);
 
-        assertEquals(expectedResult, LoanQuote.canProduceQuote(lenders, amountRequested));
+        assertEquals(expectedResult, App.canProduceQuote(lenders, amountRequested));
     }
 
     @DisplayName("Test successful generation of quotes")
@@ -145,7 +147,7 @@ public class LoanQuoteTest {
         // This test increases coverage... but it's black-box testing. That means that it likely should not exist as
         // unit test. A code review should shed light as to whether it should be kept or not.
         try {
-            LoanQuote.main(cliParameters);
+            App.main(cliParameters);
         } catch (Exception e) {
             fail("The execution shouldn't have resulted in " + e.getClass() + "exception with message: " + e.getMessage());
         }
