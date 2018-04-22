@@ -1,0 +1,40 @@
+apply plugin: 'java'
+apply plugin: 'org.junit.platform.gradle.plugin'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+// Added to allow gradle's buildscript to run Junit 5' unit tests.
+// This is not a project's dependency.
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath('org.junit.platform:junit-platform-gradle-plugin:1.0.2')
+    }
+}
+
+dependencies {
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.0.2'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.0.2'
+    testCompile group: 'org.junit.platform', name: 'junit-platform-gradle-plugin', version: '1.0.1'
+
+    // See https://github.com/junit-team/junit5-samples/issues/45
+    testCompile group: 'org.apiguardian', name: 'apiguardian-api', version: '1.0.0'
+
+    // To run Junit5' units test as a gradle task: gradle test
+    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.0.1'
+    testRuntime group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.0.1'
+    testRuntime group: 'org.junit.platform', name: 'junit-platform-runner', version: '1.0.1'
+}
+
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'quotation.LoanQuote'
+    }
+}
