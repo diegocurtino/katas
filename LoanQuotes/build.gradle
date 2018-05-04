@@ -35,6 +35,6 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'app.LoanQuote'
+        attributes 'Main-Class': 'app.App'
     }
 }
