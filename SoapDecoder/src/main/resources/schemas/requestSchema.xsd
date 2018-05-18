@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1 (branches/2.1-6728; 2011-02-03T14:14:58+0000) JAXWS-RI/2.2.3 JAXWS/2.2. -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="urn:com:tickstar:exam:a:messages"
+           elementFormDefault="qualified" attributeFormDefault="unqualified"
+           targetNamespace="urn:com:tickstar:exam:a:messages" version="1.0">
+    <xs:element name="TickstarInputMessage">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Contact" type="tns:Contact"/>
+                <xs:element name="Input" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="Contact">
+        <xs:sequence>
+            <xs:element name="FirstName" type="xs:string"/>
+            <xs:element name="LastName" type="xs:string"/>
+            <xs:element name="BirthDate" type="xs:date"/>
+            <xs:element name="EmailAddress" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
