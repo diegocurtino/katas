@@ -13,9 +13,9 @@ public class ContactFactory {
 
     public static Contact createDefaultContact() throws DatatypeConfigurationException {
         Contact contact = new Contact();
-        contact.setFirstName("Diego");
-        contact.setLastName("Curtino");
-        contact.setEmailAddress("dcurtino@hotmail.com");
+        contact.setFirstName("John");
+        contact.setLastName("Doe");
+        contact.setEmailAddress("xxxxxxxx@xxxx.com");
         contact.setBirthDate(getBirthDate());
         return contact;
     }
