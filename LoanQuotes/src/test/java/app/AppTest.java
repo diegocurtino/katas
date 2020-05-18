@@ -1,27 +1,22 @@
 package app;
 
 import lender.Lender;
-import lender.LenderValidator;
+import lender.LenderFileManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import quote.Quote;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AppTest {
 
@@ -43,24 +38,6 @@ public class AppTest {
                 Arguments.of("lenders_one_with_invalid_rate.csv", Arrays.asList("Angela, Dave, Fred, Jane, John, Mary")), // Bob's skipped. His rate is written with ; instead of ."
                 Arguments.of("lenders_without_incorrect_info.csv", Arrays.asList("Angela, Bob, Dave, Fred, Jane, John, Mary")) // No lender is skipped
         );
-    }
-
-    private static List<Lender> loadLendersData(String fileName) throws IOException {
-        Path lenderFilePath = Paths.get("src/test/resources/" + fileName);
-        List<Lender> lenders = new ArrayList<>();
-
-        try (BufferedReader reader = Files.newBufferedReader(lenderFilePath, StandardCharsets.UTF_8)) {
-            String line = null;
-
-            reader.readLine(); // Skip the header (going with the assumption that files will contain a header as in the provided example)
-            while ((line = reader.readLine()) != null) {
-                String[] lenderData = line.split(",");
-                if (LenderValidator.isLenderDataValid(lenderData)) {
-                    lenders.add(new Lender(lenderData));
-                }
-            }
-        }
-        return lenders;
     }
 
     private static Stream<Arguments> loanRequests() {
@@ -91,7 +68,7 @@ public class AppTest {
     @ParameterizedTest
     @MethodSource("lenderFiles")
     void validateLoadOfLendersData(String lendersFilename, List<String> expectedLenderNames) throws IOException {
-        List<Lender> lenders = loadLendersData(lendersFilename);
+        List<Lender> lenders = LenderFileManager.loadLendersData("src/test/resources/" + lendersFilename);
 
         List<String> lenderNames = lenders
                 .stream()
@@ -106,7 +83,7 @@ public class AppTest {
     @ParameterizedTest
     @MethodSource("loanRequests")
     void testAbilityToSatisfyLoanRequest(String lendersFilename, int amountRequested, boolean expectedResult) throws IOException {
-        List<Lender> lenders = loadLendersData(lendersFilename);
+        List<Lender> lenders = LenderFileManager.loadLendersData("src/test/resources/" + lendersFilename);
 
         assertEquals(expectedResult, App.canProduceQuote(lenders, amountRequested));
     }
@@ -121,7 +98,7 @@ public class AppTest {
                                        String expectedMonthlyInstallment,
                                        String expectedTotalRepayment) throws IOException {
 
-        List<Lender> lenders = loadLendersData(lendersFilename);
+        List<Lender> lenders = LenderFileManager.loadLendersData("src/test/resources/" + lendersFilename);
         lenders.sort(Lender::compareTo);
 
         Quote quote = new Quote(lenders, amountRequested);
