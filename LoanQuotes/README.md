@@ -15,7 +15,7 @@ inclusive.
 If the market does not have sufficient offers from lenders to satisfy the loan then the
 system should inform the borrower that it is not possible to provide a quote at that time.
 
-## Feedback received from delivered solution##
+## Feedback received from delivered solution ##
 
 1. Good separation of concerns
 2. Missing CSV file decoupling. 

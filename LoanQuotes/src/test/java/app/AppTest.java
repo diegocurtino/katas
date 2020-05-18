@@ -79,13 +79,6 @@ public class AppTest {
         );
     }
 
-    private static Stream<Arguments> lendersAndAmounts() {
-        return Stream.of(
-                Arguments.of((Object) new String[]{"src/test/resources/lenders_without_incorrect_info.csv", "1000"}),
-                Arguments.of((Object) new String[]{"src/test/resources/lenders_without_incorrect_info.csv", "2400"})
-        );
-    }
-
     @DisplayName("Validate handling of invalid CLI parameters")
     @ParameterizedTest
     @MethodSource("invalidInputParametersProvider")
@@ -138,18 +131,5 @@ public class AppTest {
         assertEquals(expectedMonthlyInstallment, quote.getMonthlyInstallment());
         assertEquals(expectedTotalRepayment, quote.getTotalRepayment());
         assertEquals(amountRequested, quote.getAmountRequested());
-    }
-
-    @DisplayName("Test app end to end")
-    @ParameterizedTest
-    @MethodSource("lendersAndAmounts")
-    void testExecutionWithValidParametersGoesThrough(String[] cliParameters) {
-        // This test increases coverage... but it's black-box testing. That means that it likely should not exist as
-        // unit test. A code review should shed light as to whether it should be kept or not.
-        try {
-            App.main(cliParameters);
-        } catch (Exception e) {
-            fail("The execution shouldn't have resulted in " + e.getClass() + "exception with message: " + e.getMessage());
-        }
     }
 }
