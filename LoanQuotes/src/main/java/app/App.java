@@ -5,7 +5,6 @@ import lender.LenderFileManager;
 import quote.Quote;
 
 import java.io.IOException;
-import java.util.Currency;
 import java.util.List;
 
 public class App {
@@ -30,8 +29,7 @@ public class App {
         UserInputValidator.validateAmountToBorrowValue(args[1]);
     }
 
-    public static boolean canProduceQuote(List<Lender> lenders, int amountRequested) {
-        // The only reason to make it public is to make it testable directly.
+    private static boolean canProduceQuote(List<Lender> lenders, int amountRequested) {
         int availableFunds = lenders
                 .stream()
                 .mapToInt(Lender::getAvailableFunds)
@@ -41,11 +39,11 @@ public class App {
     }
 
     private static void displayQuoteInfo(Quote quote) {
-        Currency c = Currency.getInstance("GBP");
+        String currencySymbol = Quote.getDefaultCurrency().getSymbol();
 
-        System.out.println("Requested amount: " + c.getSymbol() + quote.getAmountRequested());
+        System.out.println("Requested amount: " + currencySymbol + quote.getAmountRequested());
         System.out.println("Rate: " + quote.getAnnualPercentageRateAsPercentage());
-        System.out.println("Monthly repayment: " + c.getSymbol() + quote.getMonthlyInstallment());
-        System.out.println("Total repayment: " + c.getSymbol() + quote.getTotalRepayment());
+        System.out.println("Monthly repayment: " + currencySymbol + quote.getMonthlyInstallment());
+        System.out.println("Total repayment: " + currencySymbol + quote.getTotalRepayment());
     }
 }

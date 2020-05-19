@@ -5,9 +5,11 @@ import lender.Lender;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.Currency;
 import java.util.List;
 
 public class Quote {
+    private static final Currency DEFAULT_CURRENCY = Currency.getInstance("GBP");
     private static final int SCALE_BIG_DECIMAL_VALUES = 6;
 
     private static final int AMONT_OF_MONTHY_INSTALLMENTS = 36;
@@ -116,20 +118,6 @@ public class Quote {
     }
 
     /**
-     * Formats annual interest rate as a 5 decimal positions rounded number.
-     * <p>
-     * Don't use this value is you intend to do calculation requiring precision. The value returned by this method lacks
-     * it since the formatter will round it. This method is intended to be used with display purposes.
-     *
-     * @return the annual interest rate rounded to 5 decimal digits.
-     */
-    public String getAnnualInterestRate() {
-        DecimalFormat df = new DecimalFormat("0.00000");
-        df.setRoundingMode(RoundingMode.HALF_EVEN);
-        return df.format(annualInterestRate);
-    }
-
-    /**
      * Formats monthly installment's amount as a 2 decimal positions rounded number
      * <p>
      * Don't use this value is you intend to do calculation requiring precision. The value returned by this method lacks
@@ -168,5 +156,9 @@ public class Quote {
 
     public int getAmountRequested() {
         return amountRequested;
+    }
+
+    public static Currency getDefaultCurrency() {
+        return DEFAULT_CURRENCY;
     }
 }

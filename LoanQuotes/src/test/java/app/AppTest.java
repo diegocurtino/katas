@@ -8,15 +8,17 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import quote.Quote;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AppTest {
 
@@ -51,8 +53,8 @@ public class AppTest {
     private static Stream<Arguments> quotes() {
         return Stream.of(
                 // The expected average APR rates were calculated in Excel following the formulas provided in Quote class.
-                Arguments.of("lenders_without_incorrect_info.csv", 1000, "0.06785", "7.0%", "30.78", "1108.08"),
-                Arguments.of("lenders_without_incorrect_info.csv", 2300, "0.07521", "7.8%", "71.57", "2576.52")
+                Arguments.of("lenders_without_incorrect_info.csv", 1000, "7.0%", "30.78", "1108.08"),
+                Arguments.of("lenders_without_incorrect_info.csv", 2300, "7.8%", "71.57", "2576.52")
         );
     }
 
@@ -79,34 +81,31 @@ public class AppTest {
         assertEquals(expectedLenderNames.toString(), lenderNames.toString());
     }
 
-    @DisplayName("Test bank capability to produce a loan's quote")
-    @ParameterizedTest
-    @MethodSource("loanRequests")
-    void testAbilityToSatisfyLoanRequest(String lendersFilename, int amountRequested, boolean expectedResult) throws IOException {
-        List<Lender> lenders = LenderFileManager.loadLendersData("src/test/resources/" + lendersFilename);
-
-        assertEquals(expectedResult, App.canProduceQuote(lenders, amountRequested));
-    }
-
-    @DisplayName("Test successful generation of quotes")
+    @DisplayName("Test application whole flow")
     @ParameterizedTest
     @MethodSource("quotes")
-    void testSuccessfulQuoteGeneration(String lendersFilename,
-                                       int amountRequested,
-                                       String expectedAnnualInterestRate,
-                                       String expectedAnnualPercentageRate,
-                                       String expectedMonthlyInstallment,
-                                       String expectedTotalRepayment) throws IOException {
+    void testAppEndToEnd(String lendersFilename,
+                         int amountRequested,
+                         String expectedAnnualPercentageRate,
+                         String expectedMonthlyInstallment,
+                         String expectedTotalRepayment) throws IOException {
 
-        List<Lender> lenders = LenderFileManager.loadLendersData("src/test/resources/" + lendersFilename);
-        lenders.sort(Lender::compareTo);
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
 
-        Quote quote = new Quote(lenders, amountRequested);
+        String[] params = new String[] {"src/test/resources/" + lendersFilename, String.valueOf(amountRequested)};
 
-        assertEquals(expectedAnnualInterestRate, quote.getAnnualInterestRate()); // Technically not needed; good to have when something goes wrong.
-        assertEquals(expectedAnnualPercentageRate, quote.getAnnualPercentageRateAsPercentage());
-        assertEquals(expectedMonthlyInstallment, quote.getMonthlyInstallment());
-        assertEquals(expectedTotalRepayment, quote.getTotalRepayment());
-        assertEquals(amountRequested, quote.getAmountRequested());
+        App.main(params);
+
+        String output = outContent.toString(StandardCharsets.UTF_8);
+        String currencySymbol = Quote.getDefaultCurrency().getSymbol();
+
+        assertTrue(output.contains("Requested amount: " + currencySymbol + amountRequested));
+        assertTrue(output.contains("Rate: " + expectedAnnualPercentageRate));
+        assertTrue(output.contains("Monthly repayment: " + currencySymbol + expectedMonthlyInstallment));
+        assertTrue(output.contains("Total repayment: " + currencySymbol + expectedTotalRepayment));
+
+        System.setOut(originalOut);
     }
 }
