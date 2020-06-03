@@ -14,13 +14,3 @@ inclusive.
 
 If the market does not have sufficient offers from lenders to satisfy the loan then the
 system should inform the borrower that it is not possible to provide a quote at that time.
-
-## Feedback received from delivered solution ##
-
-1. Good separation of concerns
-2. Missing CSV file decoupling. 
-3. Package naming does not hint what they are for (quotation and internal) 
-4. Making methods public just for testing reasons It's a bad practice. 
-5. The logic reading the CSV file is not decoupled, so it's duplicated in a test where that logic is tested. The logic should be tested on the production class, in case it is changed.
-6. Lender constructor accepting an array of strings and parsing. Not good. 
-7. Quote has all the logic in the constructor.
