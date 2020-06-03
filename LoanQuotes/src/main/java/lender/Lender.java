@@ -4,15 +4,14 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 
 public class Lender implements Comparable<Lender> {
-
     private final String name;
     private final BigDecimal rate;
     private final int availableFunds;
 
-    public Lender(String[] lenderData) {
-        name = lenderData[0].trim();
-        rate = new BigDecimal(lenderData[1]);
-        availableFunds = Integer.parseInt(lenderData[2]);
+    public Lender(String name, BigDecimal rate, int availableFunds) {
+        this.name = name;
+        this.rate = rate;
+        this.availableFunds = availableFunds;
     }
 
     public String getName() {

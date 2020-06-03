@@ -2,6 +2,7 @@ package lender;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +25,11 @@ public class LenderFileManager {
                 String[] lenderData = line.split(",");
 
                 if (LenderValidator.isLenderDataValid(lenderData)) {
-                    lenders.add(new Lender(lenderData));
+                    String name = lenderData[0].trim();
+                    BigDecimal rate = new BigDecimal(lenderData[1]);
+                    int availableFunds = Integer.parseInt(lenderData[2]);
+
+                    lenders.add(new Lender(name, rate, availableFunds));
                 }
             }
         }
