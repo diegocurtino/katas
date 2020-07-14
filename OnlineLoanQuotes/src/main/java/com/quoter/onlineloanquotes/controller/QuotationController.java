@@ -1,6 +1,7 @@
 package com.quoter.onlineloanquotes.controller;
 
 import com.quoter.onlineloanquotes.quote.Quote;
+import com.quoter.onlineloanquotes.validators.UserInputValidator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,11 +15,7 @@ public class QuotationController {
 
     @GetMapping("/quote")
     public Quote getQuote(@RequestParam @NotNull int amountRequested) {
-        //TODO: Solve error stack trace.
-        //TODO: Read lenders file.
-        //TODO: Consider implementing the ControllerAdvise
-        System.out.println("Credit requested: " + amountRequested);
-
-        return new Quote(amountRequested);
+        UserInputValidator.validateAmountToBorrow(amountRequested);
+        return new Quote(amountRequested, "John Doe");
     }
 }
