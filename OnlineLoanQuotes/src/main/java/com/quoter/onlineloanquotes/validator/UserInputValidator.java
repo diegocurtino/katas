@@ -1,4 +1,4 @@
-package com.quoter.onlineloanquotes.validators;
+package com.quoter.onlineloanquotes.validator;
 
 import com.quoter.onlineloanquotes.exceptions.AmountException;
 

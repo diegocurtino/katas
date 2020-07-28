@@ -5,5 +5,4 @@ import lombok.Data;
 @Data
 public class Quote {
     private final int amountRequested;
-    private final String borrowerName;
 }

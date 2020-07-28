@@ -1,6 +1,5 @@
-package com.quoter.onlineloanquotes.controller.advise;
+package com.quoter.onlineloanquotes.controller;
 
-import com.quoter.onlineloanquotes.controller.error.ErrorMessage;
 import com.quoter.onlineloanquotes.exceptions.AmountException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.quoter.onlineloanquotes.controller.error;
+package com.quoter.onlineloanquotes.controller;
 
 import lombok.Data;
 
