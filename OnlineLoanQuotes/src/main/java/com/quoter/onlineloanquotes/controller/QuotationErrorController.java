@@ -12,12 +12,12 @@ import java.util.Collections;
 import java.util.Map;
 
 @RestController
-@RequestMapping({OnlineLoanQuotesErrorController.ERROR_PATH})
-public class OnlineLoanQuotesErrorController extends AbstractErrorController {
+@RequestMapping({QuotationErrorController.ERROR_PATH})
+public class QuotationErrorController extends AbstractErrorController {
 
     static final String ERROR_PATH = "/error";
 
-    public OnlineLoanQuotesErrorController(ErrorAttributes errorAttributes) {
+    public QuotationErrorController(ErrorAttributes errorAttributes) {
         super(errorAttributes, Collections.emptyList());
     }
 

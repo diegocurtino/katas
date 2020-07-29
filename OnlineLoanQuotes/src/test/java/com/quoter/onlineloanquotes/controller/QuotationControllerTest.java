@@ -13,6 +13,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -25,24 +26,23 @@ public class QuotationControllerTest {
     private MockMvc mockMvc;
 
     private QuotationController controller = new QuotationController();
+    private QuotationControllerAdvise controllerAdvise = new QuotationControllerAdvise();
 
     private JacksonTester<Quote> jsonWriter;
     private JacksonTester<ErrorMessage> errorWriter;
-
 
     @BeforeEach
     public void setup() {
         JacksonTester.initFields(this, new ObjectMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
-                .setControllerAdvice(new QuotationControllerAdvise())
+                .setControllerAdvice(controllerAdvise)
                 .build();
     }
 
     @Test
     public void canProduceQuotation() throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(
-                get("/quote?amountRequested=500")
-                        .accept(MediaType.APPLICATION_JSON))
+        MockHttpServletResponse response = mockMvc.perform(get("/quote?amountRequested=500")
+                .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
 
@@ -62,6 +62,11 @@ public class QuotationControllerTest {
     @ParameterizedTest
     @MethodSource("amountValues")
     public void amountRequestedIsNotValid(String amountRequested, String errorMessage) throws Exception {
+        String expectedApiVersion = "1.0";
+
+        // This is done to overcome the limitation that Spring is not injecting the value for apiVersion which results
+        // in a null value in the test.
+        ReflectionTestUtils.setField(controllerAdvise, "apiVersion", expectedApiVersion);
 
         MockHttpServletResponse response = mockMvc.perform(
                 get("/quote?amountRequested=" + amountRequested)
@@ -69,7 +74,7 @@ public class QuotationControllerTest {
                 .andReturn()
                 .getResponse();
 
-        ErrorMessage message = new ErrorMessage(null, HttpStatus.BAD_REQUEST.value(), errorMessage,
+        ErrorMessage message = new ErrorMessage(expectedApiVersion, HttpStatus.BAD_REQUEST.value(), errorMessage,
                 AmountException.class.getSimpleName());
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
