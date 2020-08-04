@@ -80,4 +80,16 @@ public class QuotationControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.getContentAsString()).isEqualTo(errorWriter.write(message).getJson());
     }
+
+    @Test
+    public void mediaTypeIsNotSupported() throws Exception {
+        MockHttpServletResponse response = mockMvc.perform(
+                get("/quote?amountRequested=500")
+                        .accept(MediaType.TEXT_HTML))
+                .andReturn()
+                .getResponse();
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_ACCEPTABLE.value());
+        assertThat(response.getContentAsString()).isEqualTo("Acceptable MIME type:" + MediaType.APPLICATION_JSON_VALUE);
+    }
 }
