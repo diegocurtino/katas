@@ -1,4 +1,4 @@
-package com.quoter.onlineloanquotes.app;
+package com.quoter.onlineloanquotes;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

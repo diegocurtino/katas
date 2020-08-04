@@ -1,4 +1,4 @@
-package com.quoter.onlineloanquotes.app;
+package com.quoter.onlineloanquotes;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

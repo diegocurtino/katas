@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-public class QuotationControllerTest {
+public class QuotationControllerMockMvcStandAloneTest {
     private MockMvc mockMvc;
 
     private QuotationController controller = new QuotationController();
@@ -64,8 +64,9 @@ public class QuotationControllerTest {
     public void amountRequestedIsNotValid(String amountRequested, String errorMessage) throws Exception {
         String expectedApiVersion = "1.0";
 
-        // This is done to overcome the limitation that Spring is not injecting the value for apiVersion which results
-        // in a null value in the test.
+        // Since the tests in this class are executed as unit tests without Spring's context, apiVersion's value in app's
+        // controller advise is not injected and it's equal to NULL. Using ReflectionTestUnits we can set a value for it
+        // in spite that we shouldn't abuse of it since manipulating object via reflection is not a good practice.
         ReflectionTestUtils.setField(controllerAdvise, "apiVersion", expectedApiVersion);
 
         MockHttpServletResponse response = mockMvc.perform(
