@@ -8,11 +8,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @RestController
+@ApiIgnore // To make Swagger to ignore it.
 public class QuotationErrorController extends BasicErrorController {
 
     public QuotationErrorController(ErrorAttributes errorAttributes) {
