@@ -16,7 +16,6 @@ import java.util.function.Predicate;
 @Configuration
 public class SwaggerConfiguration implements WebMvcConfigurer {
 
-    ///TODO: Try to replace with OAS structures (https://www.dariawan.com/tutorials/spring/documenting-spring-boot-rest-api-springdoc-openapi-3/)
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.OAS_30)
@@ -27,7 +26,7 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
                 .useDefaultResponseMessages(false);
     }
 
-    private ApiInfo getApiInfo() {
+    private static ApiInfo getApiInfo() {
         String description = "Generates a quote for a loan to be repaid in 36 monthly installments";
 
         return new ApiInfo("Online Loan Quote Generator", description, "1.0", null,

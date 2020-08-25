@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 @RestControllerAdvice
 public class QuotationControllerAdvise {
 
@@ -25,5 +28,17 @@ public class QuotationControllerAdvise {
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public String handleWrongMediaType() {
         return "Acceptable MIME type:" + MediaType.APPLICATION_JSON_VALUE;
+    }
+
+    @ExceptionHandler(IOException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorMessage handleIoException() {
+        return new ErrorMessage(apiVersion, HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred while processing a quote. Try again later", "Internal error");
+    }
+
+    @ExceptionHandler(URISyntaxException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorMessage handleUriSyntaxException() {
+        return new ErrorMessage(apiVersion, HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred while processing a quote. Try again later", "Internal error");
     }
 }

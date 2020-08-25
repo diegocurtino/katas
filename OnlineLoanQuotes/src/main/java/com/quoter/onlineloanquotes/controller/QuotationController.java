@@ -1,5 +1,7 @@
 package com.quoter.onlineloanquotes.controller;
 
+import com.quoter.onlineloanquotes.lender.Lender;
+import com.quoter.onlineloanquotes.lender.LenderFileManager;
 import com.quoter.onlineloanquotes.quote.Quote;
 import com.quoter.onlineloanquotes.validator.UserInputValidator;
 import io.swagger.annotations.ApiOperation;
@@ -13,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.List;
 
 @RestController
 @Validated
@@ -24,8 +29,12 @@ public class QuotationController {
             @ApiResponse(responseCode = "200", description = "Quote could be produced"),
             @ApiResponse(responseCode = "400", description = "There is a problem with the specified amount")
     })
-    public Quote getQuote(@ApiParam(value = "Amount requested") @RequestParam @NotNull int amountRequested) {
+    public Quote getQuote(@ApiParam(value = "Amount requested") @RequestParam @NotNull int amountRequested)
+            throws IOException, URISyntaxException {
+
         UserInputValidator.validateAmountToBorrow(amountRequested);
+        List<Lender> lenders = LenderFileManager.loadLendersData();
+
         return new Quote(amountRequested);
     }
 }
