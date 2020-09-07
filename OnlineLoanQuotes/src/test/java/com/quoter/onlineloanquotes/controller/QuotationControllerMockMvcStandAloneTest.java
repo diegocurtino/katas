@@ -2,6 +2,8 @@ package com.quoter.onlineloanquotes.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.quoter.onlineloanquotes.exceptions.AmountException;
+import com.quoter.onlineloanquotes.lender.Lender;
+import com.quoter.onlineloanquotes.lender.LenderFileManager;
 import com.quoter.onlineloanquotes.quote.Quote;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +19,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,8 +49,11 @@ public class QuotationControllerMockMvcStandAloneTest {
                 .andReturn()
                 .getResponse();
 
+        List<Lender> lenders = LenderFileManager.loadLendersData();
+        lenders.sort(Lender::compareTo);
+
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).isEqualTo(jsonWriter.write(new Quote(500)).getJson());
+        assertThat(response.getContentAsString()).isEqualTo(jsonWriter.write(new Quote(lenders, 500)).getJson());
     }
 
     private static Stream<Arguments> amountValues() {

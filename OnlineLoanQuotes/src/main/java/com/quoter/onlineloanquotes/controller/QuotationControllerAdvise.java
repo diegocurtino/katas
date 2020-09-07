@@ -1,6 +1,7 @@
 package com.quoter.onlineloanquotes.controller;
 
 import com.quoter.onlineloanquotes.exceptions.AmountException;
+import com.quoter.onlineloanquotes.exceptions.QuoteException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,5 +35,11 @@ public class QuotationControllerAdvise {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage handleIoException() {
         return new ErrorMessage(apiVersion, HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred while processing a quote. Try again later", "Internal error");
+    }
+
+    @ExceptionHandler(QuoteException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorMessage handleQuoteException(QuoteException e) {
+        return new ErrorMessage(apiVersion, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), QuoteException.class.getSimpleName());
     }
 }

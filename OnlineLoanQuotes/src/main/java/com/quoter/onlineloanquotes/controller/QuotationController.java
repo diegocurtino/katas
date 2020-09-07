@@ -1,8 +1,10 @@
 package com.quoter.onlineloanquotes.controller;
 
+import com.quoter.onlineloanquotes.exceptions.QuoteException;
 import com.quoter.onlineloanquotes.lender.Lender;
 import com.quoter.onlineloanquotes.lender.LenderFileManager;
 import com.quoter.onlineloanquotes.quote.Quote;
+import com.quoter.onlineloanquotes.quote.QuoteValidator;
 import com.quoter.onlineloanquotes.validator.UserInputValidator;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,7 +29,8 @@ public class QuotationController {
     @GetMapping(value = "/quote", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Quote could be produced"),
-            @ApiResponse(responseCode = "400", description = "There is a problem with the specified amount")
+            @ApiResponse(responseCode = "400", description = "Thee specified amount is not valid"),
+            @ApiResponse(responseCode = "500", description = "There is a problem to produce a quote")
     })
     public Quote getQuote(@ApiParam(value = "Amount requested") @RequestParam @NotNull int amountRequested)
             throws IOException, URISyntaxException {
@@ -35,6 +38,10 @@ public class QuotationController {
         UserInputValidator.validateAmountToBorrow(amountRequested);
         List<Lender> lenders = LenderFileManager.loadLendersData();
 
-        return new Quote(amountRequested);
+        if (QuoteValidator.canProduceQuote(lenders, amountRequested)) {
+            lenders.sort(Lender::compareTo); // Only sort lender's data once we know we can actually quote the requested loan.
+            return new Quote(lenders, amountRequested);
+        }
+        throw new QuoteException("There are not enough funds to produce a quote for the amount (" + amountRequested + ") requested");
     }
 }
