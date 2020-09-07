@@ -30,15 +30,9 @@ public class QuotationControllerAdvise {
         return "Acceptable MIME type:" + MediaType.APPLICATION_JSON_VALUE;
     }
 
-    @ExceptionHandler(IOException.class)
+    @ExceptionHandler({IOException.class, URISyntaxException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage handleIoException() {
-        return new ErrorMessage(apiVersion, HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred while processing a quote. Try again later", "Internal error");
-    }
-
-    @ExceptionHandler(URISyntaxException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorMessage handleUriSyntaxException() {
         return new ErrorMessage(apiVersion, HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred while processing a quote. Try again later", "Internal error");
     }
 }

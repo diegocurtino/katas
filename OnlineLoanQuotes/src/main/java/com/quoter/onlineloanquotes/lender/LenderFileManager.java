@@ -16,7 +16,7 @@ public class LenderFileManager {
 
     public static List<Lender> loadLendersData() throws IOException, URISyntaxException {
 
-        // TODO: Let's start small with a specific file in a specific location. Later, we can make it specified via the API.
+        // TODO: Let's start small with a specific file in a specific location. Later, we can read from the DB or read diff. files based on some param.
         Path lenderFilePath = Paths.get(LenderFileManager.class.getClassLoader().getResource(LENDERS_FILENAME).toURI());
         List<Lender> lenders = new ArrayList<>();
 

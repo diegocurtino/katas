@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class Quote {
-    @ApiModelProperty(notes = "Amount to borrow", name = "amount", required = true)
+    @ApiModelProperty(value = "Amount to borrow", required = true, example = "1400")
     private final int amountRequested;
 }
