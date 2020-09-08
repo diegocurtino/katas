@@ -1,6 +1,9 @@
 package com.quoter.onlineloanquotes.quote;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.quoter.onlineloanquotes.lender.Lender;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -11,18 +14,25 @@ import java.util.Currency;
 import java.util.List;
 
 @Data
+@ApiModel
 public class Quote {
     private static final Currency DEFAULT_CURRENCY = Currency.getInstance("GBP");
     private static final int SCALE_BIG_DECIMAL_VALUES = 6;
 
     private static final int AMOUNT_OF_MONTHLY_INSTALLMENTS = 36;
     private static final int TIMES_INTEREST_IS_COMPOUNDED_PER_YEAR = 12;
-    private final double monthlyPayment;
 
+    @JsonIgnore
+    private double monthlyPayment;
+
+    @JsonIgnore
     private double averageAnnualPercentageRate;
+
+    @JsonIgnore
     private double annualInterestRate;
 
-    @ApiModelProperty(value = "Amount to borrow", required = true, example = "1400")
+    // TODO: Why do I have to annotate the field instead of ignoring it like the others?
+    @ApiModelProperty(value = "Total amount to borrow", required = true, example = "1400")
     private final int amountRequested;
 
     public Quote(List<Lender> lenders, int amount) {
@@ -116,6 +126,8 @@ public class Quote {
      *
      * @return the APR's formatted as percentage rounded to one decimal position.
      */
+    @ApiModelProperty(value = "Annual Interest Rate as Percentage", required = true, example = "7.0%")
+    @JsonProperty("interestRate")
     public String getAnnualPercentageRateAsPercentage() {
         DecimalFormat df = new DecimalFormat("0.0%");
         df.setRoundingMode(RoundingMode.HALF_EVEN);
@@ -130,6 +142,7 @@ public class Quote {
      *
      * @return loan's monthly installment rounded to 2 decimal positions.
      */
+    @ApiModelProperty(value = "Amount to pay monthly", required = true, example = "30.78")
     public String getMonthlyInstallment() {
         DecimalFormat df = new DecimalFormat("##.00");
         df.setRoundingMode(RoundingMode.HALF_EVEN);
@@ -151,6 +164,8 @@ public class Quote {
      *
      * @return the total sum paid for a loan (interest included) rounded as a 2 decimal positions number.
      */
+
+    @ApiModelProperty(value = "Total amount to be paid after the last payment is made", required = true, example = "1108")
     public String getTotalRepayment() {
         DecimalFormat df = new DecimalFormat("#####.00");
         df.setRoundingMode(RoundingMode.HALF_EVEN);
@@ -159,11 +174,8 @@ public class Quote {
         return df.format(roundedValue);
     }
 
+    @ApiModelProperty(value = "Amount to borrow", required = true, example = "1400")
     public int getAmountRequested() {
         return amountRequested;
-    }
-
-    public static Currency getDefaultCurrency() {
-        return DEFAULT_CURRENCY;
     }
 }
