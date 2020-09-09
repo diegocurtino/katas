@@ -1,10 +1,8 @@
 package com.quoter.onlineloanquotes.controller;
 
-import com.quoter.onlineloanquotes.exceptions.QuoteException;
 import com.quoter.onlineloanquotes.lender.Lender;
 import com.quoter.onlineloanquotes.lender.LenderFileManager;
 import com.quoter.onlineloanquotes.quote.Quote;
-import com.quoter.onlineloanquotes.quote.QuoteValidator;
 import com.quoter.onlineloanquotes.validator.UserInputValidator;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -37,11 +35,7 @@ public class QuotationController {
 
         UserInputValidator.validateAmountToBorrow(amountRequested);
         List<Lender> lenders = LenderFileManager.loadLendersData();
-
-        if (QuoteValidator.canProduceQuote(lenders, amountRequested)) {
-            lenders.sort(Lender::compareTo); // Only sort lender's data once we know we can actually quote the requested loan.
-            return new Quote(lenders, amountRequested);
-        }
-        throw new QuoteException("There are not enough funds to produce a quote for the amount (" + amountRequested + ") requested");
+        lenders.sort(Lender::compareTo);
+        return new Quote(lenders, amountRequested);
     }
 }

@@ -2,6 +2,7 @@ package com.quoter.onlineloanquotes.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.quoter.onlineloanquotes.exceptions.AmountException;
+import com.quoter.onlineloanquotes.exceptions.QuoteException;
 import com.quoter.onlineloanquotes.lender.Lender;
 import com.quoter.onlineloanquotes.lender.LenderFileManager;
 import com.quoter.onlineloanquotes.quote.Quote;
@@ -56,6 +57,37 @@ public class QuotationControllerMockMvcStandAloneTest {
         assertThat(response.getContentAsString()).isEqualTo(jsonWriter.write(new Quote(lenders, 500)).getJson());
     }
 
+    @Test
+    public void cannotProduceQuotation() throws Exception {
+        String expectedApiVersion = "1.0";
+        setApiVersionValueUsingReflection(expectedApiVersion);
+
+        String amountRequested = "15000";
+
+        MockHttpServletResponse response = mockMvc.perform(get("/quote?amountRequested=" + amountRequested)
+                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+
+        List<Lender> lenders = LenderFileManager.loadLendersData();
+        lenders.sort(Lender::compareTo);
+
+        String errorMessage = "There are not enough funds to produce a quote for the amount (" + amountRequested + ") requested";
+
+        ErrorMessage message = new ErrorMessage(expectedApiVersion, HttpStatus.INTERNAL_SERVER_ERROR.value(), errorMessage,
+                QuoteException.class.getSimpleName());
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(response.getContentAsString()).isEqualTo(errorWriter.write(message).getJson());
+    }
+
+    private void setApiVersionValueUsingReflection(String expectedApiVersion) {
+        // Since the tests in this class are executed as unit tests without Spring's context, apiVersion's value in app's
+        // controller advise is not injected and it's equal to NULL. Using ReflectionTestUnits we can set a value for it
+        // in spite that we shouldn't abuse of it since manipulating object via reflection is not a good practice.
+        ReflectionTestUtils.setField(controllerAdvise, "apiVersion", expectedApiVersion);
+    }
+
     private static Stream<Arguments> amountValues() {
         return Stream.of(
                 Arguments.of("50", "The amount requested (50) is below the minimum amount this bank loans."),
@@ -69,11 +101,7 @@ public class QuotationControllerMockMvcStandAloneTest {
     @MethodSource("amountValues")
     public void amountRequestedIsNotValid(String amountRequested, String errorMessage) throws Exception {
         String expectedApiVersion = "1.0";
-
-        // Since the tests in this class are executed as unit tests without Spring's context, apiVersion's value in app's
-        // controller advise is not injected and it's equal to NULL. Using ReflectionTestUnits we can set a value for it
-        // in spite that we shouldn't abuse of it since manipulating object via reflection is not a good practice.
-        ReflectionTestUtils.setField(controllerAdvise, "apiVersion", expectedApiVersion);
+        setApiVersionValueUsingReflection(expectedApiVersion);
 
         MockHttpServletResponse response = mockMvc.perform(
                 get("/quote?amountRequested=" + amountRequested)

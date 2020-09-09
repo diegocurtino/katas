@@ -2,6 +2,7 @@ package com.quoter.onlineloanquotes.quote;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.quoter.onlineloanquotes.exceptions.QuoteException;
 import com.quoter.onlineloanquotes.lender.Lender;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -35,10 +36,24 @@ public class Quote {
     private int amountRequested;
 
     public Quote(List<Lender> lenders, int amount) {
+
+        if (!canProduceQuote(lenders, amount)) {
+            throw new QuoteException("There are not enough funds to produce a quote for the amount (" + amount + ") requested");
+        }
+
         amountRequested = amount;
         averageAnnualPercentageRate = calculateAverageAnnualPercentageRate(lenders);
         annualInterestRate = calculateAnnualInterestRate();
         monthlyPayment = calculateMonthlyInstallment();
+    }
+
+    private static boolean canProduceQuote(List<Lender> lenders, int amountRequested) {
+        int availableFunds = lenders
+                .stream()
+                .mapToInt(Lender::getAvailableFunds)
+                .sum();
+
+        return availableFunds >= amountRequested;
     }
 
     /**
