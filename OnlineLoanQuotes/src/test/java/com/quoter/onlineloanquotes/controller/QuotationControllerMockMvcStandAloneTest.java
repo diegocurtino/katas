@@ -1,8 +1,8 @@
 package com.quoter.onlineloanquotes.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.quoter.onlineloanquotes.exceptions.AmountException;
-import com.quoter.onlineloanquotes.exceptions.QuoteException;
+import com.quoter.onlineloanquotes.exception.AmountException;
+import com.quoter.onlineloanquotes.exception.QuoteException;
 import com.quoter.onlineloanquotes.lender.Lender;
 import com.quoter.onlineloanquotes.lender.LenderFileManager;
 import com.quoter.onlineloanquotes.quote.Quote;

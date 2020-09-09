@@ -1,6 +1,6 @@
 package com.quoter.onlineloanquotes.controller;
 
-import com.quoter.onlineloanquotes.exceptions.AmountException;
+import com.quoter.onlineloanquotes.exception.AmountException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

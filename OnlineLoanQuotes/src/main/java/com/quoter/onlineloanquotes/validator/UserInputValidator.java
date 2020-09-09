@@ -1,6 +1,6 @@
 package com.quoter.onlineloanquotes.validator;
 
-import com.quoter.onlineloanquotes.exceptions.AmountException;
+import com.quoter.onlineloanquotes.exception.AmountException;
 
 public class UserInputValidator {
     private static final int MINIMUM_LOAN = 100;

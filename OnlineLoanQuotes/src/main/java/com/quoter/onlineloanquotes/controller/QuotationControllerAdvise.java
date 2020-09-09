@@ -1,7 +1,7 @@
 package com.quoter.onlineloanquotes.controller;
 
-import com.quoter.onlineloanquotes.exceptions.AmountException;
-import com.quoter.onlineloanquotes.exceptions.QuoteException;
+import com.quoter.onlineloanquotes.exception.AmountException;
+import com.quoter.onlineloanquotes.exception.QuoteException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

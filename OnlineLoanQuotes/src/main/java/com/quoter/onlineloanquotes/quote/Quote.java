@@ -2,7 +2,7 @@ package com.quoter.onlineloanquotes.quote;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.quoter.onlineloanquotes.exceptions.QuoteException;
+import com.quoter.onlineloanquotes.exception.QuoteException;
 import com.quoter.onlineloanquotes.lender.Lender;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
