@@ -31,9 +31,8 @@ public class Quote {
     @JsonIgnore
     private double annualInterestRate;
 
-    // TODO: Why do I have to annotate the field instead of ignoring it like the others?
-    @ApiModelProperty(value = "Total amount to borrow", required = true, example = "1400")
-    private final int amountRequested;
+    @JsonIgnore
+    private int amountRequested;
 
     public Quote(List<Lender> lenders, int amount) {
         amountRequested = amount;
@@ -175,7 +174,7 @@ public class Quote {
     }
 
     @ApiModelProperty(value = "Amount to borrow", required = true, example = "1400")
-    public int getAmountRequested() {
+    public int getAmountBorrowed() {
         return amountRequested;
     }
 }
