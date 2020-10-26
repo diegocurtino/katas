@@ -192,4 +192,12 @@ public class Quote {
     public int getAmountBorrowed() {
         return amountRequested;
     }
+
+    @Override
+    public String toString() {
+        return "Amount Requested: " + amountRequested +
+                ", Total to repay: " + getTotalRepayment() +
+                ", Monthly Payment: " + getMonthlyInstallment() +
+                ", Interest Rate: " + getAnnualPercentageRateAsPercentage();
+    }
 }

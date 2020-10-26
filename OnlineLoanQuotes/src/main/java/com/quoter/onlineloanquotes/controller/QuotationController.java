@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import java.util.List;
 @RestController
 @Validated
 public class QuotationController {
+    private static final Logger LOGGER = LogManager.getLogger(QuotationController.class);
 
     @ApiOperation(value = "Retrieve an online quote for a loan", response = Quote.class)
     @GetMapping(value = "/quote", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -36,6 +39,9 @@ public class QuotationController {
         UserInputValidator.validateAmountToBorrow(amountRequested);
         List<Lender> lenders = LenderFileManager.loadLendersData();
         lenders.sort(Lender::compareTo);
-        return new Quote(lenders, amountRequested);
+
+        Quote quote = new Quote(lenders, amountRequested);
+        LOGGER.info("Produced quote: {}", quote);
+        return quote;
     }
 }
