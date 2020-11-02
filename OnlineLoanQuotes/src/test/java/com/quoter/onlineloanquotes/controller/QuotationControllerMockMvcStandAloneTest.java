@@ -28,6 +28,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * From: https://thepracticaldeveloper.com/guide-spring-boot-controller-tests/
+ * <p>
+ * This type of testing (stand alone) requires explicit configuration of the items used in the test (controller and
+ * controller advice for instance) in the setup method.
  */
 public class QuotationControllerMockMvcStandAloneTest {
     private MockMvc mockMvc;
@@ -41,6 +44,9 @@ public class QuotationControllerMockMvcStandAloneTest {
     @BeforeEach
     public void setup() {
         JacksonTester.initFields(this, new ObjectMapper());
+
+        // Any part of your logic that is placed outside the Controller class (e.g. ControllerAdvice, Filters) needs to
+        // be configured here. The reason is that you there's no Spring context that can inject them automatically.
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(controllerAdvise)
                 .build();

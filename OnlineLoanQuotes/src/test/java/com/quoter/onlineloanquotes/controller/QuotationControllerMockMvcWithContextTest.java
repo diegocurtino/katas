@@ -28,10 +28,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * From: https://thepracticaldeveloper.com/guide-spring-boot-controller-tests/
+ * <p>
+ * This type of testing (with context) does not require a setup method that stand alone tests do. Here, the controller
+ * advice is injected automatically. If there were any filters, they too would be injected automatically.
  */
-@ExtendWith(SpringExtension.class)
+@ExtendWith(SpringExtension.class) // Initializes a partial Spring context.
 @AutoConfigureJsonTesters
-@WebMvcTest(QuotationController.class)
+@WebMvcTest(QuotationController.class) // Gets the MockMVC instance auto-configured and available in the context
 public class QuotationControllerMockMvcWithContextTest {
     @Autowired
     private MockMvc mockMvc;
