@@ -8,11 +8,11 @@ public class UserInputValidator {
 
     public static void validateAmountToBorrow(int amount) {
         if (amount < MINIMUM_LOAN) {
-            throw new AmountException("The amount requested (" + amount + ") is below the minimum amount this bank loans.");
+            throw new AmountException("The amount requested (" + amount + ") is below the minimum amount (" + MINIMUM_LOAN + ") this bank loans.");
         }
 
         if (amount > MAXIMUM_LOAN) {
-            throw new AmountException("The amount requested (" + amount + ") is above the maximum amount this bank loans.");
+            throw new AmountException("The amount requested (" + amount + ") is above the maximum amount (" + MAXIMUM_LOAN + ") this bank loans.");
         }
 
         if (amount % 100 != 0) {

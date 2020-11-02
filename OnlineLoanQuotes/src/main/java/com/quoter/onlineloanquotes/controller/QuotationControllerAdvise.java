@@ -2,6 +2,8 @@ package com.quoter.onlineloanquotes.controller;
 
 import com.quoter.onlineloanquotes.exception.AmountException;
 import com.quoter.onlineloanquotes.exception.QuoteException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +17,7 @@ import java.net.URISyntaxException;
 
 @RestControllerAdvice
 public class QuotationControllerAdvise {
+    private static final Logger LOGGER = LogManager.getLogger(QuotationControllerAdvise.class);
 
     @Value("${onlineloanquotes.api.version}")
     private String apiVersion;
@@ -22,6 +25,7 @@ public class QuotationControllerAdvise {
     @ExceptionHandler(AmountException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage handleAmountException(AmountException e) {
+        LOGGER.info(e.getMessage());
         return new ErrorMessage(apiVersion, HttpStatus.BAD_REQUEST.value(), e.getMessage(), AmountException.class.getSimpleName());
     }
 
@@ -40,6 +44,7 @@ public class QuotationControllerAdvise {
     @ExceptionHandler(QuoteException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage handleQuoteException(QuoteException e) {
+        LOGGER.info(e.getMessage());
         return new ErrorMessage(apiVersion, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), QuoteException.class.getSimpleName());
     }
 }
