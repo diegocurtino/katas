@@ -1,7 +1,11 @@
 package com.quoter.onlineloanquotes.controller;
 
 import com.quoter.onlineloanquotes.exception.AmountException;
+import com.quoter.onlineloanquotes.lender.Lender;
+import com.quoter.onlineloanquotes.lender.LenderFileManager;
+import com.quoter.onlineloanquotes.quote.Quote;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -16,11 +20,15 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+/**
+ * From: https://thepracticaldeveloper.com/guide-spring-boot-controller-tests/
+ */
 @ExtendWith(SpringExtension.class)
 @AutoConfigureJsonTesters
 @WebMvcTest(QuotationController.class)
@@ -30,6 +38,9 @@ public class QuotationControllerMockMvcWithContextTest {
 
     @Autowired
     private JacksonTester<ErrorMessage> errorWriter;
+
+    @Autowired
+    private JacksonTester<Quote> quoteWriter;
 
     private static Stream<Arguments> amountValues() {
         return Stream.of(
@@ -56,5 +67,26 @@ public class QuotationControllerMockMvcWithContextTest {
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.getContentAsString()).isEqualTo(errorWriter.write(message).getJson());
+    }
+
+    @DisplayName("Produce quote")
+    @Test
+    //public void produceQuote(String amountRequested, String errorMessage) throws Exception {
+    public void produceQuote() throws Exception {
+        int amountToBorrow = 500;
+
+        // Since the tests in this class are executed with Spring's context, apiVersion's value in app's controller
+        // advise is injected and there no need to set it via ReflectionTestUnits.
+        MockHttpServletResponse response = mockMvc.perform(
+                get("/quote?amountRequested=" + amountToBorrow)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+
+        List<Lender> lenders = LenderFileManager.loadLendersData();
+        lenders.sort(Lender::compareTo);
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(quoteWriter.write(new Quote(lenders, amountToBorrow)).getJson());
     }
 }

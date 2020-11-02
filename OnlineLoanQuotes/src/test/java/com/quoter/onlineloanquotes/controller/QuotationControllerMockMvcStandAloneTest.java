@@ -26,6 +26,9 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+/**
+ * From: https://thepracticaldeveloper.com/guide-spring-boot-controller-tests/
+ */
 public class QuotationControllerMockMvcStandAloneTest {
     private MockMvc mockMvc;
 
