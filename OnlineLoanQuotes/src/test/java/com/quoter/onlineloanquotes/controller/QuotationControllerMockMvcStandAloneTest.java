@@ -99,8 +99,8 @@ public class QuotationControllerMockMvcStandAloneTest {
 
     private static Stream<Arguments> amountValues() {
         return Stream.of(
-                Arguments.of("50", "The amount requested (50) is below the minimum amount this bank loans."),
-                Arguments.of("15100", "The amount requested (15100) is above the maximum amount this bank loans."),
+                Arguments.of("50", "The amount requested (50) is below the minimum amount (100) this bank loans."),
+                Arguments.of("15100", "The amount requested (15100) is above the maximum amount (15000) this bank loans."),
                 Arguments.of("14001", "The amount requested must be multiple of 100.")
         );
     }
