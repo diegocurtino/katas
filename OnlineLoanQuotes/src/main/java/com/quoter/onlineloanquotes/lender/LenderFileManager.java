@@ -2,25 +2,21 @@ package com.quoter.onlineloanquotes.lender;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LenderFileManager {
     private static final String LENDERS_FILENAME = "lenders.csv";
 
-    public static List<Lender> loadLendersData() throws IOException, URISyntaxException {
-
-        // TODO: Let's start small with a specific file in a specific location. Later, we can read from the DB or read diff. files based on some param.
-        Path lenderFilePath = Paths.get(LenderFileManager.class.getClassLoader().getResource(LENDERS_FILENAME).toURI());
+    public static List<Lender> loadLendersData() throws IOException {
         List<Lender> lenders = new ArrayList<>();
 
-        try (BufferedReader reader = Files.newBufferedReader(lenderFilePath, StandardCharsets.UTF_8)) {
+        try (InputStream is = LenderFileManager.class.getClassLoader().getResourceAsStream(LENDERS_FILENAME);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String line = null;
 
             reader.readLine(); // Skip the header
