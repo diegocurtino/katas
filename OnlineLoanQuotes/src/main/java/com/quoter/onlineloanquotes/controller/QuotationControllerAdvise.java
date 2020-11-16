@@ -37,7 +37,7 @@ public class QuotationControllerAdvise {
     @ExceptionHandler(IOException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage handleIoException() {
-        LOGGER.info(e.getMessage());
+        LOGGER.info("An I/O exception occurred while producing a quote");
         return new ErrorMessage(apiVersion, HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred while processing a quote. Try again later", "Internal error");
     }
 
