@@ -7,7 +7,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -18,34 +17,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ConcurrentApp {
     private static final Logger LOGGER = LogManager.getLogger(ConcurrentApp.class);
     private static final Random RANDOM_GENERATOR = new Random();
+    private static final int AMOUNT_OF_QUOTES = 150;
     private static AtomicInteger validQuoteAmount = new AtomicInteger(0);
     private static AtomicInteger invalidQuoteAmount = new AtomicInteger(0);
-    private static final int AMOUNT_OF_QUOTES = 150;
 
-    public static void main(String[] args) throws IOException, URISyntaxException {
+    public static void main(String[] args) throws IOException {
         ConcurrentApp concurrentApp = new ConcurrentApp();
         concurrentApp.produceQuotes();
-    }
-
-    private void produceQuotes() throws IOException, URISyntaxException {
-        QuotationController Controller = new QuotationController();
-
-        List<Lender> lenders = LenderFileManager.loadLendersData();
-        lenders.sort(Lender::compareTo);
-
-        ExecutorService executor = Executors.newFixedThreadPool(150);
-        for (int i = 0; i < AMOUNT_OF_QUOTES; i++) {
-            Runnable runnable = new QuoteControllerRunnable(Controller, getAmount());
-            Future<?> result = executor.submit(runnable);
-            try {
-                result.get();
-            } catch (Exception e) {
-                LOGGER.info(e.getMessage());
-            }
-        }
-        executor.shutdown();
-        LOGGER.info("Total valid: {}", validQuoteAmount.get());
-        LOGGER.info("Total invalid: {}", invalidQuoteAmount.get());
     }
 
     /**
@@ -76,5 +54,26 @@ public class ConcurrentApp {
             return amount;
         }
         return amount - (amount % 100);
+    }
+
+    private void produceQuotes() throws IOException {
+        QuotationController Controller = new QuotationController();
+
+        List<Lender> lenders = LenderFileManager.loadLendersData();
+        lenders.sort(Lender::compareTo);
+
+        ExecutorService executor = Executors.newFixedThreadPool(150);
+        for (int i = 0; i < AMOUNT_OF_QUOTES; i++) {
+            Runnable runnable = new QuoteControllerRunnable(Controller, getAmount());
+            Future<?> result = executor.submit(runnable);
+            try {
+                result.get();
+            } catch (Exception e) {
+                LOGGER.info(e.getMessage());
+            }
+        }
+        executor.shutdown();
+        LOGGER.info("Total valid: {}", validQuoteAmount.get());
+        LOGGER.info("Total invalid: {}", invalidQuoteAmount.get());
     }
 }

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Random;
 
@@ -36,7 +35,7 @@ public class QuotationController {
             @ApiResponse(responseCode = "500", description = "There is a problem to produce a quote")
     })
     public Quote getQuote(@ApiParam(value = "Amount requested") @RequestParam @NotNull int amountRequested)
-            throws IOException, URISyntaxException {
+            throws IOException {
 
         int transactionId = RANDOM_GENERATOR.ints(0, Integer.MAX_VALUE).findFirst().getAsInt();
         LOGGER.info("TransactionId {}. Quote request: {}", transactionId, amountRequested);
