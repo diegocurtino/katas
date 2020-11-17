@@ -40,11 +40,11 @@ public class QuotationController {
         int transactionId = RANDOM_GENERATOR.ints(0, Integer.MAX_VALUE).findFirst().getAsInt();
         LOGGER.info("TransactionId {}. Quote request: {}", transactionId, amountRequested);
 
-        UserInputValidator.validateAmountToBorrow(amountRequested);
+        UserInputValidator.validateAmountToBorrow(transactionId, amountRequested);
         List<Lender> lenders = LenderFileManager.loadLendersData();
         lenders.sort(Lender::compareTo);
 
-        Quote quote = new Quote(lenders, amountRequested);
+        Quote quote = new Quote(transactionId, lenders, amountRequested);
         LOGGER.info("TransactionId: {}. Quote produced: {}", transactionId, quote);
         return quote;
     }

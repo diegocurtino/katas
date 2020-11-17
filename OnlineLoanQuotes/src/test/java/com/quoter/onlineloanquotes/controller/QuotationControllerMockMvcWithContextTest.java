@@ -90,6 +90,6 @@ public class QuotationControllerMockMvcWithContextTest {
         lenders.sort(Lender::compareTo);
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).isEqualTo(quoteWriter.write(new Quote(lenders, amountToBorrow)).getJson());
+        assertThat(response.getContentAsString()).isEqualTo(quoteWriter.write(new Quote(1, lenders, amountToBorrow)).getJson());
     }
 }

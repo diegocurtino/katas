@@ -63,7 +63,7 @@ public class QuotationControllerMockMvcStandAloneTest {
         lenders.sort(Lender::compareTo);
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).isEqualTo(jsonWriter.write(new Quote(lenders, 500)).getJson());
+        assertThat(response.getContentAsString()).isEqualTo(jsonWriter.write(new Quote(1, lenders, 500)).getJson());
     }
 
     @Test
@@ -122,7 +122,7 @@ public class QuotationControllerMockMvcStandAloneTest {
                 AmountException.class.getSimpleName());
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.getContentAsString()).isEqualTo(errorWriter.write(message).getJson());
+        assertThat(response.getContentAsString()).contains(errorMessage); // Do not validate the whole message (to avoid dealing with the transaction id)
     }
 
     @Test

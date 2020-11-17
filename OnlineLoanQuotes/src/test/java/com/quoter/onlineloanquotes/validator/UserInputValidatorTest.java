@@ -25,7 +25,7 @@ public class UserInputValidatorTest {
     @ParameterizedTest
     @MethodSource("amountValues")
     void validateIncorrectInputParameters(int amountRequested, String expectedMessage) {
-        Exception e = assertThrows(AmountException.class, () -> UserInputValidator.validateAmountToBorrow(amountRequested));
+        Exception e = assertThrows(AmountException.class, () -> UserInputValidator.validateAmountToBorrow(1, amountRequested));
         assertEquals(e.getMessage(), expectedMessage);
     }
 }

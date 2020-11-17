@@ -7,6 +7,8 @@ import com.quoter.onlineloanquotes.lender.Lender;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -17,6 +19,7 @@ import java.util.List;
 @Data
 @ApiModel
 public class Quote {
+    private static final Logger LOGGER = LogManager.getLogger(Quote.class);
     private static final Currency DEFAULT_CURRENCY = Currency.getInstance("GBP");
     private static final int SCALE_BIG_DECIMAL_VALUES = 6;
 
@@ -35,10 +38,12 @@ public class Quote {
     @JsonIgnore
     private int amountRequested;
 
-    public Quote(List<Lender> lenders, int amount) {
+    public Quote(int transactionId, List<Lender> lenders, int amount) {
 
         if (!canProduceQuote(lenders, amount)) {
-            throw new QuoteException("There are not enough funds to produce a quote for the amount (" + amount + ") requested");
+            String message = "There are not enough funds to produce a quote for the amount (" + amount + ") requested";
+            LOGGER.info("TransactionId {} .{}", transactionId, message);
+            throw new QuoteException(message);
         }
 
         amountRequested = amount;

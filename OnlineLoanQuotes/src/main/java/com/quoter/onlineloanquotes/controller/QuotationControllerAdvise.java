@@ -24,7 +24,6 @@ public class QuotationControllerAdvise {
     @ExceptionHandler(AmountException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage handleAmountException(AmountException e) {
-        LOGGER.info(e.getMessage());
         return new ErrorMessage(apiVersion, HttpStatus.BAD_REQUEST.value(), e.getMessage(), AmountException.class.getSimpleName());
     }
 
@@ -44,7 +43,6 @@ public class QuotationControllerAdvise {
     @ExceptionHandler(QuoteException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage handleQuoteException(QuoteException e) {
-        LOGGER.info(e.getMessage());
         return new ErrorMessage(apiVersion, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), QuoteException.class.getSimpleName());
     }
 }
