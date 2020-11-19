@@ -2,12 +2,14 @@ package com.quoter.onlineloanquotes.controller;
 
 import com.quoter.onlineloanquotes.exception.AmountException;
 import com.quoter.onlineloanquotes.exception.QuoteException;
+import com.quoter.onlineloanquotes.exception.SourceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -44,5 +46,19 @@ public class QuotationControllerAdvise {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage handleQuoteException(QuoteException e) {
         return new ErrorMessage(apiVersion, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), QuoteException.class.getSimpleName());
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorMessage handleMissingParamException(MissingServletRequestParameterException e) {
+        LOGGER.info(e.getMessage());
+        return new ErrorMessage(apiVersion, HttpStatus.BAD_REQUEST.value(), e.getMessage(), MissingServletRequestParameterException.class.getSimpleName());
+    }
+
+    @ExceptionHandler(SourceException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorMessage handleSourceException(SourceException e) {
+        LOGGER.info(e.getMessage());
+        return new ErrorMessage(apiVersion, HttpStatus.BAD_REQUEST.value(), e.getMessage(), SourceException.class.getSimpleName());
     }
 }
