@@ -86,7 +86,7 @@ public class QuotationControllerMockMvcWithContextTest {
                 .andReturn()
                 .getResponse();
 
-        List<Lender> lenders = LenderFileManager.loadLendersData(Source.CSV);
+        List<Lender> lenders = LenderFileManager.loadLendersData();
         lenders.sort(Lender::compareTo);
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());

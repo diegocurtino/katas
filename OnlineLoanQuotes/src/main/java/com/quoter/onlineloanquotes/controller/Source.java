@@ -2,7 +2,7 @@ package com.quoter.onlineloanquotes.controller;
 
 public enum Source {
     CSV("CSV file"),
-    ELASTIC_SEARCH("ElasticSearch");
+    ELASTIC_SEARCH("Elastic_Search");
 
     private String name;
 

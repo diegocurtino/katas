@@ -1,6 +1,7 @@
 package com.quoter.onlineloanquotes.controller;
 
 import com.quoter.onlineloanquotes.exception.SourceException;
+import com.quoter.onlineloanquotes.lender.ElasticSearchManager;
 import com.quoter.onlineloanquotes.lender.Lender;
 import com.quoter.onlineloanquotes.lender.LenderFileManager;
 import com.quoter.onlineloanquotes.quote.Quote;
@@ -36,20 +37,24 @@ public class QuotationController {
             @ApiResponse(responseCode = "500", description = "There is a problem to produce a quote")
     })
     public Quote getQuote(@ApiParam(value = "Amount requested") @RequestParam @NotNull int amountRequested,
-                          @ApiParam(value = "Lenders source", allowableValues = "CSV, ElasticSearch") @RequestParam @NotNull String lendersSource)
+                          @ApiParam(value = "Lenders source", allowableValues = "CSV, Elastic_Search") @RequestParam @NotNull String lendersSource)
             throws IOException {
 
-        int transactionId = RANDOM_GENERATOR.ints(0, Integer.MAX_VALUE).findFirst().getAsInt();
-        LOGGER.info("TransactionId {}. Quote requested: {}", transactionId, amountRequested);
-
-        Source source = validateAndGetSource(lendersSource);
+        int transactionId = QuotationController.RANDOM_GENERATOR.ints(0, Integer.MAX_VALUE).findFirst().getAsInt();
+        QuotationController.LOGGER.info("TransactionId {}. Quote requested: {}", transactionId, amountRequested);
 
         UserInputValidator.validateAmountToBorrow(transactionId, amountRequested);
-        List<Lender> lenders = LenderFileManager.loadLendersData();
+        Source source = QuotationController.validateAndGetSource(lendersSource.toUpperCase());
+
+        List<Lender> lenders = switch (source) {
+            case CSV -> LenderFileManager.loadLendersData();
+            case ELASTIC_SEARCH -> ElasticSearchManager.loadLendersData();
+        };
+
         lenders.sort(Lender::compareTo);
 
         Quote quote = new Quote(transactionId, lenders, amountRequested);
-        LOGGER.info("TransactionId {}. Quote produced: {}", transactionId, quote);
+        QuotationController.LOGGER.info("TransactionId {}. Quote produced: {}", transactionId, quote);
         return quote;
     }
 
