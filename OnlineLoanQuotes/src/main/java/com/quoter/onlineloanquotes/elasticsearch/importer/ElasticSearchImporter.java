@@ -1,4 +1,4 @@
-package com.quoter.onlineloanquotes.elasticimporter;
+package com.quoter.onlineloanquotes.elasticsearch.importer;
 
 import com.quoter.onlineloanquotes.lender.Lender;
 import com.quoter.onlineloanquotes.lender.LenderFileManager;
@@ -36,7 +36,7 @@ public class ElasticSearchImporter {
 
             IndexRequest request = new IndexRequest(ElasticSearchImporter.INDEX_NAME).source(jsonMap);
 
-            // It seems that it's not possible to do async execution if the client is closed right after that.
+            // It seems that it's not possible to do async execution if the client is closed right after that (which makes sense)
             //client.indexAsync(request, RequestOptions.DEFAULT, listenerName);
             IndexResponse response = client.index(request, RequestOptions.DEFAULT);
             LOGGER.info("Result {}. Lender {}", response.getResult(), lender);

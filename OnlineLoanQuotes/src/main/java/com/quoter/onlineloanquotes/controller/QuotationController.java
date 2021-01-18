@@ -1,8 +1,8 @@
 package com.quoter.onlineloanquotes.controller;
 
 import com.quoter.onlineloanquotes.exception.SourceException;
-import com.quoter.onlineloanquotes.lender.ElasticSearchManager;
 import com.quoter.onlineloanquotes.lender.Lender;
+import com.quoter.onlineloanquotes.lender.LenderElasticSearchManager;
 import com.quoter.onlineloanquotes.lender.LenderFileManager;
 import com.quoter.onlineloanquotes.quote.Quote;
 import com.quoter.onlineloanquotes.validator.UserInputValidator;
@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,9 @@ import java.util.Random;
 @RestController
 @Validated // Added to o tell Spring to evaluate the constraint annotations on method parameters
 public class QuotationController {
+    @Autowired
+    private LenderElasticSearchManager lenderElasticSearchManager;
+
     private static final Logger LOGGER = LogManager.getLogger(QuotationController.class);
     private static final Random RANDOM_GENERATOR = new Random();
 
@@ -48,7 +52,7 @@ public class QuotationController {
 
         List<Lender> lenders = switch (source) {
             case CSV -> LenderFileManager.loadLendersData();
-            case ELASTIC_SEARCH -> ElasticSearchManager.loadLendersData();
+            case ELASTIC_SEARCH -> lenderElasticSearchManager.loadLendersData();
         };
 
         lenders.sort(Lender::compareTo);
