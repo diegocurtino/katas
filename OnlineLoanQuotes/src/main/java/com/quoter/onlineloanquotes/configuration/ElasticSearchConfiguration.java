@@ -19,7 +19,7 @@ public class ElasticSearchConfiguration {
     @Value("${elastic.port}")
     private int port;
 
-    @Value("${elastic.schema}")
+    @Value("${elastic.scheme}")
     private String scheme;
 
     @Autowired
@@ -33,7 +33,6 @@ public class ElasticSearchConfiguration {
                 Integer.parseInt(environment.getProperty("elastic.port")),
                 environment.getProperty("elastic.schema"))));
         */
-
         return new RestHighLevelClient(RestClient.builder(new HttpHost(hostname, port, scheme)));
     }
 }

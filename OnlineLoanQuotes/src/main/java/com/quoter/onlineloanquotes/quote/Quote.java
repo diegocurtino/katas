@@ -184,7 +184,7 @@ public class Quote {
      * @return the total sum paid for a loan (interest included) rounded as a 2 decimal positions number.
      */
 
-    @ApiModelProperty(value = "Total amount to be paid after the last payment is made", required = true, example = "1108")
+    @ApiModelProperty(value = "Total amount to payed for the whole loan after the last payment is made", required = true, example = "1108")
     public String getTotalRepayment() {
         DecimalFormat df = new DecimalFormat("#####.00");
         df.setRoundingMode(RoundingMode.HALF_EVEN);

@@ -2,6 +2,7 @@ package com.quoter.onlineloanquotes.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -32,6 +33,13 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
         return new ApiInfo("Online Loan Quote Generator", description, "1.0", null,
                 new Contact("Diego Curtino", null, null), null, null,
                 Collections.emptyList());
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:4200")
+                .allowedMethods("GET");
     }
 
     @Override
