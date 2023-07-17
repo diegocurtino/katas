@@ -2,6 +2,7 @@ package com.quoter.onlineloanquotes.controller;
 
 import com.quoter.onlineloanquotes.exception.AmountException;
 import com.quoter.onlineloanquotes.lender.Lender;
+import com.quoter.onlineloanquotes.lender.LenderElasticSearchManager;
 import com.quoter.onlineloanquotes.lender.LenderFileManager;
 import com.quoter.onlineloanquotes.quote.Quote;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -39,6 +41,9 @@ public class QuotationControllerMockMvcWithContextTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+    private LenderElasticSearchManager lenderElasticSearchManager;
+
     @Autowired
     private JacksonTester<ErrorMessage> errorWriter;
 
@@ -60,7 +65,7 @@ public class QuotationControllerMockMvcWithContextTest {
         // Since the tests in this class are executed with Spring's context, apiVersion's value in app's controller
         // advise is injected and there no need to set it via ReflectionTestUnits.
         MockHttpServletResponse response = mockMvc.perform(
-                get("/quote?amountRequested=" + amountRequested)
+                get("/quote?amountRequested=" + amountRequested + "&lendersSource=CSV")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
@@ -74,14 +79,13 @@ public class QuotationControllerMockMvcWithContextTest {
 
     @DisplayName("Produce quote")
     @Test
-    //public void produceQuote(String amountRequested, String errorMessage) throws Exception {
     public void produceQuote() throws Exception {
         int amountToBorrow = 500;
 
         // Since the tests in this class are executed with Spring's context, apiVersion's value in app's controller
         // advise is injected and there no need to set it via ReflectionTestUnits.
         MockHttpServletResponse response = mockMvc.perform(
-                get("/quote?amountRequested=" + amountToBorrow)
+                get("/quote?amountRequested=" + amountToBorrow + "&lendersSource=CSV")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();

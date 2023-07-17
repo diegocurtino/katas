@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.NotNull;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
@@ -27,10 +27,10 @@ import java.util.Random;
 @RestController
 @Validated // Added to o tell Spring to evaluate the constraint annotations on method parameters
 public class QuotationController {
+    private static final Logger LOGGER = LogManager.getLogger(QuotationController.class);
+
     @Autowired
     private LenderElasticSearchManager lenderElasticSearchManager;
-
-    private static final Logger LOGGER = LogManager.getLogger(QuotationController.class);
     private static final Random RANDOM_GENERATOR = new Random();
 
     @ApiOperation(value = "Retrieve an online quote for a loan", response = Quote.class)

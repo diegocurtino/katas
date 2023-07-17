@@ -6,37 +6,33 @@ import com.quoter.onlineloanquotes.exception.QuoteException;
 import com.quoter.onlineloanquotes.lender.Lender;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.Currency;
 import java.util.List;
 
-@Data
 @ApiModel
 public class Quote {
     private static final Logger LOGGER = LogManager.getLogger(Quote.class);
-    private static final Currency DEFAULT_CURRENCY = Currency.getInstance("GBP");
-    private static final int SCALE_BIG_DECIMAL_VALUES = 6;
 
+    private static final int SCALE_BIG_DECIMAL_VALUES = 6;
     private static final int AMOUNT_OF_MONTHLY_INSTALLMENTS = 36;
     private static final int TIMES_INTEREST_IS_COMPOUNDED_PER_YEAR = 12;
 
     @JsonIgnore
-    private double monthlyPayment;
+    private final double monthlyPayment;
 
     @JsonIgnore
-    private double averageAnnualPercentageRate;
+    private final double averageAnnualPercentageRate;
 
     @JsonIgnore
-    private double annualInterestRate;
+    private final double annualInterestRate;
 
     @JsonIgnore
-    private int amountRequested;
+    private final int amountRequested;
 
     public Quote(int transactionId, List<Lender> lenders, int amount) {
 
@@ -55,7 +51,7 @@ public class Quote {
     private static boolean canProduceQuote(List<Lender> lenders, int amountRequested) {
         int availableFunds = lenders
                 .stream()
-                .mapToInt(Lender::getAvailableFunds)
+                .mapToInt(Lender::availableFunds)
                 .sum();
 
         return availableFunds >= amountRequested;
@@ -75,17 +71,14 @@ public class Quote {
 
         for (Lender lender : lenders) {
             amountOfLendersNeeded += 1;
-            sumInterestRates = sumInterestRates.add(lender.getRate());
+            sumInterestRates = sumInterestRates.add(lender.rate());
 
-            int availableFunds = lender.getAvailableFunds();
+            int availableFunds = lender.availableFunds();
 
             if (sumLeftToGather <= availableFunds) {
                 break;
             }
-
-            if (sumLeftToGather > availableFunds) {
-                sumLeftToGather -= availableFunds;
-            }
+            sumLeftToGather -= availableFunds;
         }
 
         return sumInterestRates.divide(new BigDecimal(amountOfLendersNeeded), SCALE_BIG_DECIMAL_VALUES, RoundingMode.HALF_EVEN)

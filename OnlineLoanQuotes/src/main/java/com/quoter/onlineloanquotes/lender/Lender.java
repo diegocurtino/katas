@@ -1,15 +1,11 @@
 package com.quoter.onlineloanquotes.lender;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
 
-@Data
-public class Lender implements Comparable<Lender> {
-    private final String name;
-    private final BigDecimal rate;
-    private final int availableFunds;
+public record Lender(String name, BigDecimal rate, int availableFunds) implements Comparable<Lender> {
 
     @Override
     public String toString() {
@@ -17,7 +13,7 @@ public class Lender implements Comparable<Lender> {
     }
 
     @Override
-    public int compareTo(Lender lender) {
-        return Comparator.comparing(Lender::getRate).compare(this, lender);
+    public int compareTo(@NotNull Lender lender) {
+        return Comparator.comparing(Lender::rate).compare(this, lender);
     }
 }

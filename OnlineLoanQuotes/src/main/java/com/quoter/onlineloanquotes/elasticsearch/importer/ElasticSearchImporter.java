@@ -30,9 +30,9 @@ public class ElasticSearchImporter {
         List<Lender> lenders = LenderFileManager.loadLendersData();
         for (Lender lender : lenders) {
             Map<String, Object> jsonMap = new HashMap<>();
-            jsonMap.put("Lender", lender.getName());
-            jsonMap.put("Rate", lender.getRate());
-            jsonMap.put("Available", lender.getAvailableFunds());
+            jsonMap.put("Lender", lender.name());
+            jsonMap.put("Rate", lender.rate());
+            jsonMap.put("Available", lender.availableFunds());
 
             IndexRequest request = new IndexRequest(ElasticSearchImporter.INDEX_NAME).source(jsonMap);
 

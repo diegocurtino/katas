@@ -35,8 +35,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class QuotationControllerMockMvcStandAloneTest {
     private MockMvc mockMvc;
 
-    private QuotationController controller = new QuotationController();
-    private QuotationControllerAdvise controllerAdvise = new QuotationControllerAdvise();
+    private final QuotationController controller = new QuotationController();
+    private final QuotationControllerAdvise controllerAdvise = new QuotationControllerAdvise();
 
     private JacksonTester<Quote> jsonWriter;
     private JacksonTester<ErrorMessage> errorWriter;
@@ -54,7 +54,7 @@ public class QuotationControllerMockMvcStandAloneTest {
 
     @Test
     public void canProduceQuotation() throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(get("/quote?amountRequested=500")
+        MockHttpServletResponse response = mockMvc.perform(get("/quote?amountRequested=500" + "&lendersSource=CSV")
                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
@@ -72,14 +72,13 @@ public class QuotationControllerMockMvcStandAloneTest {
         setApiVersionValueUsingReflection(expectedApiVersion);
 
         String amountRequested = "15000";
+        List<Lender> lenders = LenderFileManager.loadLendersData();
+        lenders.sort(Lender::compareTo);
 
-        MockHttpServletResponse response = mockMvc.perform(get("/quote?amountRequested=" + amountRequested)
+        MockHttpServletResponse response = mockMvc.perform(get("/quote?amountRequested=" + amountRequested + "&lendersSource=CSV")
                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
-
-        List<Lender> lenders = LenderFileManager.loadLendersData();
-        lenders.sort(Lender::compareTo);
 
         String errorMessage = "There are not enough funds to produce a quote for the amount (" + amountRequested + ") requested";
 
@@ -113,7 +112,7 @@ public class QuotationControllerMockMvcStandAloneTest {
         setApiVersionValueUsingReflection(expectedApiVersion);
 
         MockHttpServletResponse response = mockMvc.perform(
-                get("/quote?amountRequested=" + amountRequested)
+                get("/quote?amountRequested=" + amountRequested + "&lendersSource=CSV")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
@@ -128,7 +127,7 @@ public class QuotationControllerMockMvcStandAloneTest {
     @Test
     public void mediaTypeIsNotSupported() throws Exception {
         MockHttpServletResponse response = mockMvc.perform(
-                get("/quote?amountRequested=500")
+                get("/quote?amountRequested=500" + "&lendersSource=CSV")
                         .accept(MediaType.TEXT_HTML))
                 .andReturn()
                 .getResponse();
