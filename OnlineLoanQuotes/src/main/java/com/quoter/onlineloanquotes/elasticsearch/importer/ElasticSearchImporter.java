@@ -13,6 +13,7 @@ import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,13 +22,13 @@ public class ElasticSearchImporter {
     private static final Logger LOGGER = LogManager.getLogger(ElasticSearchImporter.class);
     private static final String INDEX_NAME = "lenders";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
         RestClientBuilder builder = RestClient.builder(
                 new HttpHost("localhost", 9200, "http"),
                 new HttpHost("localhost", 9201, "http"));
         RestHighLevelClient client = new RestHighLevelClient(builder);
 
-        List<Lender> lenders = LenderFileManager.loadLendersData();
+        List<Lender> lenders = LenderFileManager.loadLendersData(args[0]);
         for (Lender lender : lenders) {
             Map<String, Object> jsonMap = new HashMap<>();
             jsonMap.put("Lender", lender.name());

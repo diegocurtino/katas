@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Random;
 
@@ -28,10 +29,10 @@ import java.util.Random;
 @Validated // Added to o tell Spring to evaluate the constraint annotations on method parameters
 public class QuotationController {
     private static final Logger LOGGER = LogManager.getLogger(QuotationController.class);
+    private static final Random RANDOM_GENERATOR = new Random();
 
     @Autowired
     private LenderElasticSearchManager lenderElasticSearchManager;
-    private static final Random RANDOM_GENERATOR = new Random();
 
     @ApiOperation(value = "Retrieve an online quote for a loan", response = Quote.class)
     @GetMapping(value = "/quote", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -41,8 +42,9 @@ public class QuotationController {
             @ApiResponse(responseCode = "500", description = "There is a problem to produce a quote")
     })
     public Quote getQuote(@ApiParam(value = "Amount requested") @RequestParam @NotNull int amountRequested,
-                          @ApiParam(value = "Lenders source", allowableValues = "CSV, Elastic_Search") @RequestParam @NotNull String lendersSource)
-            throws IOException {
+                          @ApiParam(value = "Lenders source", allowableValues = "CSV, Elastic_Search") @RequestParam @NotNull String lendersSource,
+                          @ApiParam(value = "Lenders filename") @RequestParam @NotNull String filename)
+            throws IOException, URISyntaxException {
 
         int transactionId = QuotationController.RANDOM_GENERATOR.ints(0, Integer.MAX_VALUE).findFirst().getAsInt();
         QuotationController.LOGGER.info("TransactionId {}. Quote requested: {}", transactionId, amountRequested);
@@ -51,7 +53,7 @@ public class QuotationController {
         Source source = QuotationController.validateAndGetSource(lendersSource.toUpperCase());
 
         List<Lender> lenders = switch (source) {
-            case CSV -> LenderFileManager.loadLendersData();
+            case CSV -> LenderFileManager.loadLendersData(filename);
             case ELASTIC_SEARCH -> lenderElasticSearchManager.loadLendersData();
         };
 

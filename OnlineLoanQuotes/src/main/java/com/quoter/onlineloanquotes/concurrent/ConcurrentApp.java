@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -18,12 +19,12 @@ public class ConcurrentApp {
     private static final Logger LOGGER = LogManager.getLogger(ConcurrentApp.class);
     private static final Random RANDOM_GENERATOR = new Random();
     private static final int AMOUNT_OF_QUOTES = 150;
-    private static AtomicInteger validQuoteAmount = new AtomicInteger(0);
-    private static AtomicInteger invalidQuoteAmount = new AtomicInteger(0);
+    private static final AtomicInteger validQuoteAmount = new AtomicInteger(0);
+    private static final AtomicInteger invalidQuoteAmount = new AtomicInteger(0);
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
         ConcurrentApp concurrentApp = new ConcurrentApp();
-        concurrentApp.produceQuotes();
+        concurrentApp.produceQuotes(args[0]);
     }
 
     /**
@@ -56,15 +57,15 @@ public class ConcurrentApp {
         return amount - (amount % 100);
     }
 
-    private void produceQuotes() throws IOException {
+    private void produceQuotes(String lendersFilename) throws IOException, URISyntaxException {
         QuotationController Controller = new QuotationController();
 
-        List<Lender> lenders = LenderFileManager.loadLendersData();
+        List<Lender> lenders = LenderFileManager.loadLendersData(lendersFilename);
         lenders.sort(Lender::compareTo);
 
         ExecutorService executor = Executors.newFixedThreadPool(150);
         for (int i = 0; i < AMOUNT_OF_QUOTES; i++) {
-            Runnable runnable = new QuoteControllerRunnable(Controller, getAmount());
+            Runnable runnable = new QuoteControllerRunnable(Controller, getAmount(), lendersFilename);
             Future<?> result = executor.submit(runnable);
             try {
                 result.get();

@@ -6,13 +6,14 @@ import com.quoter.onlineloanquotes.exception.QuoteException;
 import com.quoter.onlineloanquotes.lender.Lender;
 import com.quoter.onlineloanquotes.lender.LenderFileManager;
 import com.quoter.onlineloanquotes.quote.Quote;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.json.JsonContent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -21,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,38 +32,51 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * This type of testing (stand alone) requires explicit configuration of the items used in the test (controller and
  * controller advice for instance) in the setup method.
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class QuotationControllerMockMvcStandAloneTest {
+    private static final QuotationController CONTROLLER_TESTED = new QuotationController();
+    private static final QuotationControllerAdvise CONTROLLER_ADVISE = new QuotationControllerAdvise();
+
     private MockMvc mockMvc;
-
-    private final QuotationController controller = new QuotationController();
-    private final QuotationControllerAdvise controllerAdvise = new QuotationControllerAdvise();
-
-    private JacksonTester<Quote> jsonWriter;
+    private JacksonTester<Quote> quoteWriter;
     private JacksonTester<ErrorMessage> errorWriter;
 
-    @BeforeEach
+    @BeforeAll
     public void setup() {
         JacksonTester.initFields(this, new ObjectMapper());
 
         // Any part of your logic that is placed outside the Controller class (e.g. ControllerAdvice, Filters) needs to
         // be configured here. The reason is that you there's no Spring context that can inject them automatically.
-        mockMvc = MockMvcBuilders.standaloneSetup(controller)
-                .setControllerAdvice(controllerAdvise)
+        mockMvc = MockMvcBuilders.standaloneSetup(CONTROLLER_TESTED)
+                .setControllerAdvice(CONTROLLER_ADVISE)
                 .build();
     }
 
-    @Test
-    public void canProduceQuotation() throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(get("/quote?amountRequested=500" + "&lendersSource=CSV")
+    @ParameterizedTest
+    @MethodSource("com.quoter.onlineloanquotes.controller.TestData#quotes")
+    public void canProduceQuotation(int amountRequested,
+                                    String expectedAnnualPercentageRate,
+                                    String expectedMonthlyInstallment,
+                                    String expectedTotalRepayment) throws Exception {
+
+        MockHttpServletResponse response = mockMvc.perform(get("/quote?amountRequested=" + amountRequested + "&lendersSource=CSV&filename=" + TestData.DEFAULT_LENDERS_FILENAME)
                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
 
-        List<Lender> lenders = LenderFileManager.loadLendersData();
+        List<Lender> lenders = LenderFileManager.loadLendersData("lenders_without_incorrect_info.csv");
         lenders.sort(Lender::compareTo);
 
+        JsonContent<Quote> quoteAsJson = quoteWriter.write(new Quote(1, lenders, amountRequested));
+        String contentAsString = response.getContentAsString();
+
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).isEqualTo(jsonWriter.write(new Quote(1, lenders, 500)).getJson());
+        assertThat(contentAsString).isEqualTo(quoteAsJson.getJson());
+
+        assertThat(quoteAsJson).hasJsonPathValue("$.amountBorrowed", String.valueOf(amountRequested));
+        assertThat(quoteAsJson).hasJsonPathValue("$.totalRepayment", expectedTotalRepayment);
+        assertThat(quoteAsJson).hasJsonPathValue("$.monthlyInstallment", expectedMonthlyInstallment);
+        assertThat(quoteAsJson).hasJsonPathValue("$.interestRate", expectedAnnualPercentageRate);
     }
 
     @Test
@@ -72,10 +85,10 @@ public class QuotationControllerMockMvcStandAloneTest {
         setApiVersionValueUsingReflection(expectedApiVersion);
 
         String amountRequested = "15000";
-        List<Lender> lenders = LenderFileManager.loadLendersData();
+        List<Lender> lenders = LenderFileManager.loadLendersData("lenders_without_incorrect_info.csv");
         lenders.sort(Lender::compareTo);
 
-        MockHttpServletResponse response = mockMvc.perform(get("/quote?amountRequested=" + amountRequested + "&lendersSource=CSV")
+        MockHttpServletResponse response = mockMvc.perform(get("/quote?amountRequested=" + amountRequested + "&lendersSource=CSV&filename=" + TestData.DEFAULT_LENDERS_FILENAME)
                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
@@ -93,27 +106,19 @@ public class QuotationControllerMockMvcStandAloneTest {
         // Since the tests in this class are executed as unit tests without Spring's context, apiVersion's value in app's
         // controller advise is not injected and it's equal to NULL. Using ReflectionTestUnits we can set a value for it
         // in spite that we shouldn't abuse of it since manipulating object via reflection is not a good practice.
-        ReflectionTestUtils.setField(controllerAdvise, "apiVersion", expectedApiVersion);
-    }
-
-    private static Stream<Arguments> amountValues() {
-        return Stream.of(
-                Arguments.of("50", "The amount requested (50) is below the minimum amount (100) this bank loans."),
-                Arguments.of("15100", "The amount requested (15100) is above the maximum amount (15000) this bank loans."),
-                Arguments.of("14001", "The amount requested must be multiple of 100.")
-        );
+        ReflectionTestUtils.setField(CONTROLLER_ADVISE, "apiVersion", expectedApiVersion);
     }
 
     @DisplayName("Validate amount requested")
     @ParameterizedTest
-    @MethodSource("amountValues")
+    @MethodSource("com.quoter.onlineloanquotes.controller.TestData#amountValues")
     public void amountRequestedIsNotValid(String amountRequested, String errorMessage) throws Exception {
         String expectedApiVersion = "1.0";
         setApiVersionValueUsingReflection(expectedApiVersion);
 
         MockHttpServletResponse response = mockMvc.perform(
-                get("/quote?amountRequested=" + amountRequested + "&lendersSource=CSV")
-                        .accept(MediaType.APPLICATION_JSON))
+                 get("/quote?amountRequested=" + amountRequested + "&lendersSource=CSV&filename=" + TestData.DEFAULT_LENDERS_FILENAME)
+                .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
 
@@ -127,8 +132,8 @@ public class QuotationControllerMockMvcStandAloneTest {
     @Test
     public void mediaTypeIsNotSupported() throws Exception {
         MockHttpServletResponse response = mockMvc.perform(
-                get("/quote?amountRequested=500" + "&lendersSource=CSV")
-                        .accept(MediaType.TEXT_HTML))
+                 get("/quote?amountRequested=500" + "&lendersSource=CSV&filename=" + TestData.DEFAULT_LENDERS_FILENAME)
+                .accept(MediaType.TEXT_HTML))
                 .andReturn()
                 .getResponse();
 
