@@ -27,7 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 /**
- * From: https://thepracticaldeveloper.com/guide-spring-boot-controller-tests/
+ * From: <a href="https://thepracticaldeveloper.com/guide-spring-boot-controller-tests/">The practical developer. How to
+ * test Spring Boot controller</a>
  * <p>
  * This type of testing (stand alone) requires explicit configuration of the items used in the test (controller and
  * controller advice for instance) in the setup method.
@@ -73,10 +74,10 @@ public class QuotationControllerMockMvcStandAloneTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(contentAsString).isEqualTo(quoteAsJson.getJson());
 
-        assertThat(quoteAsJson).hasJsonPathValue("$.amountBorrowed", String.valueOf(amountRequested));
-        assertThat(quoteAsJson).hasJsonPathValue("$.totalRepayment", expectedTotalRepayment);
-        assertThat(quoteAsJson).hasJsonPathValue("$.monthlyInstallment", expectedMonthlyInstallment);
-        assertThat(quoteAsJson).hasJsonPathValue("$.interestRate", expectedAnnualPercentageRate);
+        assertThat(quoteAsJson).hasJsonPathValue("$.amountBorrowed").extractingJsonPathNumberValue("@.amountBorrowed").isEqualTo(amountRequested);
+        assertThat(quoteAsJson).hasJsonPathValue("$.totalRepayment").extractingJsonPathStringValue("@.totalRepayment").isEqualTo(expectedTotalRepayment);
+        assertThat(quoteAsJson).hasJsonPathValue("$.monthlyInstallment").extractingJsonPathStringValue("@.monthlyInstallment").isEqualTo(expectedMonthlyInstallment);
+        assertThat(quoteAsJson).hasJsonPathValue("$.interestRate").extractingJsonPathStringValue("@.interestRate").isEqualTo(expectedAnnualPercentageRate);
     }
 
     @Test
@@ -126,7 +127,7 @@ public class QuotationControllerMockMvcStandAloneTest {
                 AmountException.class.getSimpleName());
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.getContentAsString()).contains(errorMessage); // Do not validate the whole message (to avoid dealing with the transaction id)
+        assertThat(response.getContentAsString()).isEqualTo(errorWriter.write(message).getJson());
     }
 
     @Test

@@ -65,24 +65,21 @@ public class Quote {
      */
     private double calculateAverageAnnualPercentageRate(List<Lender> lenders) {
         int sumLeftToGather = amountRequested;
-
         int amountOfLendersNeeded = 0;
         BigDecimal sumInterestRates = BigDecimal.ZERO;
 
+        // Use classic loop construct because variables used inside of it are not effectively final.
         for (Lender lender : lenders) {
-            amountOfLendersNeeded += 1;
+            amountOfLendersNeeded ++;
             sumInterestRates = sumInterestRates.add(lender.rate());
 
-            int availableFunds = lender.availableFunds();
-
-            if (sumLeftToGather <= availableFunds) {
+            if (sumLeftToGather <= lender.availableFunds()) {
                 break;
             }
-            sumLeftToGather -= availableFunds;
+            sumLeftToGather -= lender.availableFunds();
         }
 
-        return sumInterestRates.divide(new BigDecimal(amountOfLendersNeeded), SCALE_BIG_DECIMAL_VALUES, RoundingMode.HALF_EVEN)
-                .doubleValue();
+        return sumInterestRates.divide(new BigDecimal(amountOfLendersNeeded), SCALE_BIG_DECIMAL_VALUES, RoundingMode.HALF_EVEN).doubleValue();
     }
 
     /**
@@ -96,7 +93,7 @@ public class Quote {
      * i = annualInterestRate / amount of times the interest is compounded per year ({@link #TIMES_INTEREST_IS_COMPOUNDED_PER_YEAR})
      * n = total number of payments to cancel the loan (in this case: 3 * 12).
      * <p>
-     * See further details about the formula at: http://www.fonerbooks.com/interest.htm
+     * See further details about the formula at: <a href="http://www.fonerbooks.com/interest.htm">How To Calculate Mortgage Payments</a>
      *
      * @return the monthly payment a borrower is required to do to cancel a loan on term.
      */
@@ -118,7 +115,7 @@ public class Quote {
      * r = is APR's value
      * q = amount of times the interest is compounded per year ({@link #TIMES_INTEREST_IS_COMPOUNDED_PER_YEAR}
      * <p>
-     * See further details about the formula at: http://mathforum.org/dr.math/faq/faq.interest.html#apr.
+     * See further details about the formula at: <a href="https://web.archive.org/web/20080731173701/http://mathforum.org/dr.math/faq/faq.interest.html#apr">Annual PercentageRate (APR)</a>.
      *
      * @return the annual interest rate charged for a loan.
      */
