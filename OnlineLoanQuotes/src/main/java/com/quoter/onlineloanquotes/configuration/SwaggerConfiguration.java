@@ -1,51 +1,30 @@
 package com.quoter.onlineloanquotes.configuration;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-
-import java.util.Collections;
-import java.util.function.Predicate;
 
 @Configuration
-public class SwaggerConfiguration implements WebMvcConfigurer {
+public class SwaggerConfiguration {
+    private static Info getApiInfo() {
+        return new Info()
+                .title("OnlineLoanQuotes")
+                .description("This is a simple Spring Boot app used to figures about loans between £100 and £15000 to be repaid in 36 months")
+                .version("1.1")
+                .contact(getContactInfo());
+    }
+
+    private static Contact getContactInfo() {
+        return new Contact().name("DMC");
+    }
 
     @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.OAS_30)
-                .select()
-                .apis(Predicate.not(RequestHandlerSelectors.basePackage("org.springframework.boot")))
-                .build()
-                .apiInfo(getApiInfo())
-                .useDefaultResponseMessages(false);
-    }
-
-    private static ApiInfo getApiInfo() {
-        String description = "Generates a quote for a loan to be repaid in 36 monthly installments";
-
-        return new ApiInfo("Online Loan Quote Generator", description, "1.0", null,
-                new Contact("Diego Curtino", null, null), null, null,
-                Collections.emptyList());
-    }
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:4200")
-                .allowedMethods("GET");
-    }
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        //enabling swagger-ui part for visual documentation
-        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+    public OpenAPI apiDocumentation() {
+        return new OpenAPI()
+                .components(new Components())
+                .info(getApiInfo());
     }
 }

@@ -2,22 +2,16 @@ package com.quoter.onlineloanquotes.quote;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.quoter.onlineloanquotes.exception.QuoteException;
 import com.quoter.onlineloanquotes.lender.Lender;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.List;
 
-@ApiModel
+//@ApiModel
 public class Quote {
-    private static final Logger LOGGER = LogManager.getLogger(Quote.class);
-
     private static final int SCALE_BIG_DECIMAL_VALUES = 6;
     private static final int AMOUNT_OF_MONTHLY_INSTALLMENTS = 36;
     private static final int TIMES_INTEREST_IS_COMPOUNDED_PER_YEAR = 12;
@@ -34,21 +28,14 @@ public class Quote {
     @JsonIgnore
     private final int amountRequested;
 
-    public Quote(int transactionId, List<Lender> lenders, int amount) {
-
-        if (!canProduceQuote(lenders, amount)) {
-            String message = "There are not enough funds to produce a quote for the amount (" + amount + ") requested";
-            LOGGER.info("TransactionId {} .{}", transactionId, message);
-            throw new QuoteException(message);
-        }
-
+    public Quote(List<Lender> lenders, int amount) {
         amountRequested = amount;
         averageAnnualPercentageRate = calculateAverageAnnualPercentageRate(lenders);
         annualInterestRate = calculateAnnualInterestRate();
         monthlyPayment = calculateMonthlyInstallment();
     }
 
-    private static boolean canProduceQuote(List<Lender> lenders, int amountRequested) {
+    public static boolean canProduceQuote(List<Lender> lenders, int amountRequested) {
         int availableFunds = lenders
                 .stream()
                 .mapToInt(Lender::availableFunds)
@@ -70,7 +57,7 @@ public class Quote {
 
         // Use classic loop construct because variables used inside of it are not effectively final.
         for (Lender lender : lenders) {
-            amountOfLendersNeeded ++;
+            amountOfLendersNeeded++;
             sumInterestRates = sumInterestRates.add(lender.rate());
 
             if (sumLeftToGather <= lender.availableFunds()) {
@@ -135,7 +122,7 @@ public class Quote {
      *
      * @return the APR's formatted as percentage rounded to one decimal position.
      */
-    @ApiModelProperty(value = "Annual Interest Rate as Percentage", required = true, example = "7.0%")
+    @Schema(name = "intererestRate", type = "String", description = "Annual Interest Rate as Percentage", requiredMode = Schema.RequiredMode.REQUIRED, example = "7.0%")
     @JsonProperty("interestRate")
     public String getAnnualPercentageRateAsPercentage() {
         DecimalFormat df = new DecimalFormat("0.0%");
@@ -151,7 +138,8 @@ public class Quote {
      *
      * @return loan's monthly installment rounded to 2 decimal positions.
      */
-    @ApiModelProperty(value = "Amount to pay monthly", required = true, example = "30.78")
+    //@ApiModelProperty(value = "Amount to pay monthly", required = true, example = "30.78")
+    @Schema(name = "monthlyInstalment", type = "String", description = "Amount to pay monthly", requiredMode = Schema.RequiredMode.REQUIRED, example = "30.78")
     public String getMonthlyInstallment() {
         DecimalFormat df = new DecimalFormat("##.00");
         df.setRoundingMode(RoundingMode.HALF_EVEN);
@@ -174,7 +162,7 @@ public class Quote {
      * @return the total sum paid for a loan (interest included) rounded as a 2 decimal positions number.
      */
 
-    @ApiModelProperty(value = "Total amount to payed for the whole loan after the last payment is made", required = true, example = "1108")
+    @Schema(name = "totalRepayment", type = "String", description = "Total amount payed for the whole loan after the last payment is made", requiredMode = Schema.RequiredMode.REQUIRED, example = "1108")
     public String getTotalRepayment() {
         DecimalFormat df = new DecimalFormat("#####.00");
         df.setRoundingMode(RoundingMode.HALF_EVEN);
@@ -183,14 +171,14 @@ public class Quote {
         return df.format(roundedValue);
     }
 
-    @ApiModelProperty(value = "Amount to borrow", required = true, example = "1400")
+    @Schema(name = "amountBorrowed", type = "number", description = "Amount to borrow", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
     public int getAmountBorrowed() {
         return amountRequested;
     }
 
     @Override
     public String toString() {
-        return "Amount Requested: " + amountRequested +
+        return "Amount Requested: " + getAmountBorrowed() +
                 ", Total to repay: " + getTotalRepayment() +
                 ", Monthly Payment: " + getMonthlyInstallment() +
                 ", Interest Rate: " + getAnnualPercentageRateAsPercentage();

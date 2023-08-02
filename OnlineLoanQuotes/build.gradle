@@ -1,8 +1,7 @@
 plugins {
-    id 'org.springframework.boot' version '3.1.1'
-    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
-    //id 'io.freefair.lombok' version '5.1.1'
+    id 'org.springframework.boot' version '3.1.2'
+    id 'io.spring.dependency-management' version '1.1.2'
 }
 
 group = 'com.quoter'
@@ -11,22 +10,21 @@ sourceCompatibility = '17'
 
 repositories {
     mavenCentral()
-    maven { url 'https://repo.spring.io/snapshot' }
     maven { url 'https://snapshots.elastic.co/maven/' }
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-validation:3.1.1'
-    implementation 'org.springframework.boot:spring-boot-starter-web:3.1.1'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux:3.1.1'
     implementation 'org.springframework.boot:spring-boot-starter-log4j2:3.1.1'
-    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
-    implementation 'io.springfox:springfox-boot-starter:3.0.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.1.0'
     // Pending: upgrade ES dependencies to v. 8.8.2
     implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.10.0'
     implementation 'org.elasticsearch.client:elasticsearch-rest-client:7.10.0'
     implementation 'org.elasticsearch:elasticsearch:7.10.0'
+    implementation 'org.jetbrains:annotations:24.0.0'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.1.1'
+    testImplementation 'io.projectreactor:reactor-test:3.5.8'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.3'
 

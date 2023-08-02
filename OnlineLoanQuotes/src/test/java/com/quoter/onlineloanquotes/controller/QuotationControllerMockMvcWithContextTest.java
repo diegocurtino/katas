@@ -3,58 +3,46 @@ package com.quoter.onlineloanquotes.controller;
 import com.quoter.onlineloanquotes.exception.AmountException;
 import com.quoter.onlineloanquotes.lender.LenderElasticSearchManager;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static com.quoter.onlineloanquotes.controller.TestData.API_VERSION_WITH_REACTIVE_CAPABILITIES;
 
+// TODO: Update the javadocs. They do not seem to completely apply when it comes to test using webTestClient.
 /**
- * From: https://thepracticaldeveloper.com/guide-spring-boot-controller-tests/
+ * From: <a href="https://thepracticaldeveloper.com/guide-spring-boot-controller-tests/">...</a>
  * <p>
- * This type of testing (with context) does not require a setup method that stand alone tests do. Here, the controller
+ * This type of testing (with context) does not require a setup method that stand-alone tests do. Here, the controller
  * advice is injected automatically. If there were any filters, they too would be injected automatically.
  */
-@ExtendWith(SpringExtension.class) // Initializes a partial Spring context.
-@AutoConfigureJsonTesters
-@WebMvcTest(QuotationController.class) // Gets the MockMVC instance auto-configured and available in the context
+@WebFluxTest(QuotationController.class)
 public class QuotationControllerMockMvcWithContextTest {
     @MockBean
     private LenderElasticSearchManager lenderElasticSearchManager;
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private JacksonTester<ErrorMessage> errorWriter;
+    private WebTestClient webTestClient;
 
     @DisplayName("Validate amount requested")
     @ParameterizedTest
-    @MethodSource("com.quoter.onlineloanquotes.controller.TestData#amountValues")
-    public void amountRequestedIsNotValid(String amountRequested, String errorMessage) throws Exception {
-        // Since the tests in this class are executed with Spring's context, apiVersion's value in app's controller
-        // advise is injected and there no need to set it via ReflectionTestUnits.
-        MockHttpServletResponse response = mockMvc.perform(
-                 get("/quote?amountRequested=" + amountRequested + "&lendersSource=CSV&filename=" + TestData.DEFAULT_LENDERS_FILENAME)
-                .accept(MediaType.APPLICATION_JSON))
-                .andReturn()
-                .getResponse();
+    @MethodSource("com.quoter.onlineloanquotes.controller.TestData#invalidAmountValues")
+    public void amountRequestedIsNotValid(String amountRequested, String errorMessage) {
 
-        ErrorMessage message = new ErrorMessage("1.0", HttpStatus.BAD_REQUEST.value(), errorMessage,
-                AmountException.class.getSimpleName());
-
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.getContentAsString()).isEqualTo(errorWriter.write(message).getJson());
+        webTestClient.get()
+                .uri("/quote?amountRequested=" + amountRequested + "&lendersSource=CSV&filename=" + TestData.DEFAULT_LENDERS_FILENAME)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("$.apiVersion").isEqualTo(API_VERSION_WITH_REACTIVE_CAPABILITIES)
+                .jsonPath("$.code").isEqualTo(HttpStatus.BAD_REQUEST.value())
+                .jsonPath("$.message").isEqualTo(errorMessage)
+                .jsonPath("$.reason").isEqualTo(AmountException.class.getSimpleName());
     }
 }

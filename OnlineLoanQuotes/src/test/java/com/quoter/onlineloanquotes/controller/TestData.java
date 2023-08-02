@@ -6,8 +6,9 @@ import java.util.stream.Stream;
 
 public final class TestData {
     public static final String DEFAULT_LENDERS_FILENAME = "lenders_without_incorrect_info.csv";
+    public static final String API_VERSION_WITH_REACTIVE_CAPABILITIES = "1.1";
 
-    public static Stream<Arguments> quotes() {
+    public static Stream<Arguments> validQuotes() {
         return Stream.of(
                 // The expected average APR rates were calculated in Excel following the formulas provided in Quote class.
                 Arguments.of(1000, "7.0%", "30.78", "1108.08"),
@@ -15,7 +16,7 @@ public final class TestData {
         );
     }
 
-    public static Stream<Arguments> amountValues() {
+    public static Stream<Arguments> invalidAmountValues() {
         return Stream.of(
                 Arguments.of("50", "The amount requested (50) is below the minimum amount (100) this bank loans."),
                 Arguments.of("15100", "The amount requested (15100) is above the maximum amount (15000) this bank loans."),

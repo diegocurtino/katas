@@ -34,10 +34,8 @@ public class LenderValidator {
         }
 
         // If amount is a valid positive number, then accept the lender
-        int amount;
         try {
-            amount = Integer.parseInt(lenderData[2]);
-            if (amount > 0) {
+            if (Integer.parseInt(lenderData[2]) > 0) {
                 return true;
             }
         } catch (NumberFormatException e) {
