@@ -22,7 +22,7 @@ that it is not possible to provide a quote at that time.
 
 ### OpenAPI / Swagger links: ###
 - http://localhost:8080/v3/api-docs
-- http://localhost:8080/webjars/swagger-ui/index.html
+- http://localhost:8080/swagger-ui.html
 
 ### Reading material:
 - https://blog.knoldus.com/spring-webflux-how-to-test-your-controllers-using-webtestclient/

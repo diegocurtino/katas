@@ -51,9 +51,9 @@ public class QuotationController {
             @ApiResponse(responseCode = "400", description = "Thee specified amount is not valid"),
             @ApiResponse(responseCode = "500", description = "There is a problem to produce a quote")
     })
-    public Mono<Quote> getQuote(@Parameter(description = "Amount requested") @RequestParam @NotNull int amountRequested,
-                                @Parameter(description = "Lenders source") @RequestParam @NotNull String lendersSource,
-                                @Parameter(description = "Lenders filename") @RequestParam @NotNull String filename)
+    public Mono<Quote> getQuote(@Parameter(description = "Amount requested") @RequestParam int amountRequested,
+                                @Parameter(description = "Lenders source") @RequestParam String lendersSource,
+                                @Parameter(description = "Lenders filename") @RequestParam String filename)
             throws IOException, URISyntaxException {
 
         int transactionId = QuotationController.RANDOM_GENERATOR.ints(0, Integer.MAX_VALUE).findFirst().getAsInt();

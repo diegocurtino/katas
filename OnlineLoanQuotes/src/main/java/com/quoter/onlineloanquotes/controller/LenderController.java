@@ -32,7 +32,7 @@ public class LenderController {
             @ApiResponse(responseCode = "200", description = "Lenders info is retrieved"),
             @ApiResponse(responseCode = "500", description = "There is a problem to retrieve lenders information")
     })
-    public Flux<Lender> getLenders(@Parameter(description = "Lenders filename") @RequestParam @NotNull String filename) throws IOException, URISyntaxException {
+    public Flux<Lender> getLenders(@Parameter(description = "Lenders filename") @RequestParam String filename) throws IOException, URISyntaxException {
         int transactionId = LenderController.RANDOM_GENERATOR.ints(0, Integer.MAX_VALUE).findFirst().getAsInt();
         LenderController.LOGGER.info("TransactionId {}", transactionId);
 
